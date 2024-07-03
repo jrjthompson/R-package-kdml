@@ -117,7 +117,7 @@ dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
     max <- max(distances)
     standardized <- (distances - min) / (max - min)
     print("Completed distance calculation.")
-    return(list(distances = distances, bandwidths = bandwidths))
+    return(list(distances = standardized, bandwidths = bandwidths))
   }
 }
 
