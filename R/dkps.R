@@ -9,7 +9,6 @@ dkps <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   if (!(uFUN %in% v_uk)) stop("Invalid uFUN specified. Choose one of: ", paste(v_uk, collapse = ", "))
   if (!(oFUN %in% v_ok)) stop("Invalid oFUN specified. Choose one of: ", paste(v_ok, collapse = ", "))
   
-   # Get column names by type
   con_cols <- names(df)[sapply(df, is.numeric)]
   fac_cols <- names(df)[sapply(df, function(x) is.factor(x) & !is.ordered(x))]
   ord_cols <- names(df)[sapply(df, is.ordered)]
@@ -17,7 +16,6 @@ dkps <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   # Reorder the dataframe
   df_ordered <- df[, c(con_cols, fac_cols, ord_cols)]
   
-  # Bandwidth selection options (lines 52 - 77)
   if (is.null(bw)) stop("No bandwidth selection chosen. Input a numeric vector of bandwidths, or choose from 'np' or 'mscv' bandwidth selection methods")
   if (is.numeric(bw)) {
     bws <- bw[match(c(con_cols, fac_cols, ord_cols), names(df))]
