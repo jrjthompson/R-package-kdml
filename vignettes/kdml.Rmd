@@ -15,7 +15,7 @@ knitr::opts_chunk$set(message = FALSE,warning = FALSE)
 library(np)
 library(stats)
 library(MASS)
-library(kss)
+# library(kss) rename once we know the file
 library(ggplot2)
 ```
 
