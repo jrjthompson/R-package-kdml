@@ -1,14 +1,14 @@
-Package: kss
+Package: kdml
 Type: Package
-Title: Kernel Metric Learning for Mixed-type Data
+Title: Kernel Distance Metric Learning for Mixed-Type Data
 Version: 1.0
 Date: 2024-07-03
-Authors@R: c(person("John R. J", "Thompson", email = "John.thompson@ubc.ca", role = c("aut", "cre")),
+Authors@R: c(person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre")),
            person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut"))
 Author: John R. J. Thompson [aut, cre],
-  Jesse. S. Ghashti [aut]
+  Jesse S. Ghashti [aut]
 Maintainer: John R. J. Thompson <john.thompson@ubc.ca>
-Description: A package which calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables. This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.. For further details we refer the reader to the papers Ghashti, J. S. (2024), <https://dx.doi.org/10.14288/1.0443975> and Ghashti, J. S. and Thompson, J. R. J. (2023), <https://doi.org/10.48550/arXiv.2306.01890>.
+Description: Calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables. This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.. For further details we refer the reader to the papers Ghashti, J. S. (2024), <doi:10.14288/1.0443975> and Ghashti, J. S. and Thompson, J. R. J. (2023), <doi:10.48550/arXiv.2306.01890>.
 License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.5.0), np
@@ -16,4 +16,4 @@ Imports: MASS,
 Suggests: knitr, markdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-07-03 16:08:14 UTC; jesseghashti
+Packaged: 2024-07-04 22:23:12 UTC; jesseghashti

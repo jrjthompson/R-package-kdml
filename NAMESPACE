@@ -1,4 +1,4 @@
-export("kdsum", "dkss", "mscv_kdsum", "mscv_dkss") 
+export("dkps", "dkss", "mscv.dkps", "mscv.dkss") 
 import(MASS, stats)
 importFrom("np", "npudensbw")
 importFrom("utils", "combn")

@@ -1,14 +1,14 @@
-\name{dkss}
-\alias{dkss}
+\name{dkps}
+\alias{dkps}
 \title{
-Kernel Summation Similarity Distance (DKSS) with Kernel Metric Learning for Mixed-type Data
+Kernel Summation Distance (DKPA) through Kernel Metric Learning for Mixed-type Data
 }
 \description{
-This function calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables using the method described in Ghashti, J. S. (2024). This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.
+This function calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables using the method described in Ghashti, J. S. and Thompson, J. R. J (2023). This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.
 }
 \usage{
-dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", 
-    oFUN = "o_wangvanryzin", stan = TRUE)
+dkps(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", 
+      oFUN = "o_wangvanryzin", stan = TRUE)
 }
 \arguments{
   \item{df}{
@@ -31,9 +31,9 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 }
 }
 \details{
-  \code{dkss} implements the kernel summation similarity distance (DKSS) as described by Ghashti (2024). This approach uses summation kernels for continuous, nominal and ordinal data, which are then summed over all variable types to return the pairwise distance between mixed-type data. 
+  \code{dkps} implements the kernel summation distance (DKPS) as described by Ghashti and Thompson (2023). This approach uses product kernels for continuous variables, and summation kernels for nominal and ordinal data, which are then summed over all variable types to return the pairwise distance between mixed-type data. 
   
-  Each kernel requires a bandwidth specification, which can either be a user defined numeric vector of length \eqn{p} from alternative methodologies for bandwidth selection, or through two bandwidth specification methods. The \code{mscv} bandwidth selection routine is based on the maximum-similarity cross-validation routine by Ghashti (2024), invoked by the function \code{\link{mscv.dkss}}. The \code{np} bandwidth selection routine follows maximum-likelihood cross-validation techniques described by Li and Racine (2007) and Li and Racine (2003) for kernel density estimation of mixed-type data. Bandwidths will differ for each variable.
+  Each kernel requires a bandwidth specification, which can either be a user defined numeric vector of length \eqn{p} from alternative methodologies for bandwidth selection, or through two bandwidth specification methods. The \code{mscv} bandwidth selection routine is based on the maximum-similarity cross-validation routine by Ghashti and Thompson (2023), invoked by the function \code{\link{mscv.dkps}}. The \code{np} bandwidth selection routine follows maximum-likelihood cross-validation techniques described by Li and Racine (2007) and Li and Racine (2003) for kernel density estimation of mixed-type data. Bandwidths will differ for each variable.
 
   Data contained in the data frame \code{df} may constitute any combinations of continuous, nominal, or ordinal data, which is to be specified in the data frame \code{df} using \code{\link{factor}} for nominal data, and \code{\link{ordered}} for ordinal data. Data can be entered in an arbitrary order and
   data types will be detected automatically. User-inputted vectors of bandwidths \code{bw} must be defined in the same order as the variables in the data frame \code{df}, as to ensure they sorted accordingly by the routine.
@@ -43,7 +43,7 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 }
 
 \value{
-  \code{dkss} returns a \code{list} object, with the
+  \code{dkps} returns a \code{list} object, with the
   following components:
  \item{distances}{
  an \eqn{n \times n} numeric matrix containing pairwise distances between observations
@@ -57,8 +57,8 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
   Aitchison, J. and  C.G.G. Aitken (1976), \dQuote{Multivariate binary discrimination by the kernel method,} Biometrika, 63, 413-420.
   
   Cameron, A. and P. Trivedi (2005), \dQuote{Microeconometrics: Methods and Applications}, Cambridge University Press.
-  
-  Ghashti, J.S. (2024), \emph{Similarity Maximization and Shrinkage Approach in Kernel Metric Learning for Clustering Mixed-type Data (T)}, University of British Columbia.
+
+  Ghashti, J.S. and J.R.J Thompson (2023), \dQuote{Mixed-type Distance Shrinkage and Selection for Clustering via Kernel Metric Learning.} arXiv preprint arXiv:2306.01890.
   
   Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), \emph{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
   
@@ -87,9 +87,8 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
     \email{jesse.ghashti@ubc.ca}
 }
 
-
 \seealso{
- \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}, \code{\link{npudensbw}}
+ \code{\link{mscv.dkps}}, \code{\link{dkss}}, \code{\link{mscv.dkss}}
 }
 \examples{
 \dontrun{
@@ -106,14 +105,14 @@ df <- data.frame(
 # minimal implementation requires just the data frame, and will automatically be
 # defaulted to the mscv bandwidth specification technique and default kernel 
 # function
-d1 <- dkss(df = df)
+d1 <- dkps(df = df)
 # d$bandwidths to see the mscv obtained bandwidths
 # d$distances to see the distance matrix
 
 
-# try using the np package, which has few continuous and ordinal kernels 
-# to choose from. Recommended using default kernel functions
-d2 <- dkss(df = df, bw = "np")
+# try using the np package, which has few continuous and ordinal kernels to 
+# choose from. Recommended using default kernel functions
+d2 <- dkps(df = df, bw = "np")
 
 
 # precomputed bandwidth example
@@ -124,11 +123,11 @@ d2 <- dkss(df = df, bw = "np")
 # where c is the number of unique values in the i-th column of df.
 # any bandwidths outside this range will result in a warning message
 bw_vec <- c(1.0, 0.5, 0.5, 5.0, 0.3, 0.3) 
-d3 <- dkss(df = df, bw = bw_vec)
+d3 <- dkps(df = df, bw = bw_vec)
 
 
 # user-specific kernel functions example
-d5 <- dkss(df = df, bw = "mscv", cFUN = "c_epanechnikov", uFUN = "u_aitken", 
+d5 <- dkps(df = df, bw = "mscv", cFUN = "c_epanechnikov", uFUN = "u_aitken", 
       oFUN = "o_habbema")
 }
 }
@@ -140,3 +139,5 @@ d5 <- dkss(df = df, bw = "mscv", cFUN = "c_epanechnikov", uFUN = "u_aitken",
 \concept{ ~distances }
 \concept{ ~metrics }
 \concept{ ~metriclearning }
+
+

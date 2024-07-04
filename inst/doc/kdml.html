@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="John R. J. Thompson &amp; Jesse S. Ghashti" />
+
+
+<title>kdml package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">kdml package</h1>
+<h4 class="author">John R. J. Thompson &amp; Jesse S. Ghashti</h4>
+
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>The package <span class="math inline">\(\texttt{kdml}\)</span> is a
+package which calculates the pairwise distances between mixed-type
+observations consisting of numeric (continuous), factor (nominal), and
+ordered factor (ordinal) variables. This kernel metric learning
+methodology learns the bandwidths associated with each kernel function
+for each variable type and returns a distance matrix that can be
+utilized in any distance-based clustering algorithm.</p>
+<p>We define a kernel similarity between two data points <span class="math inline">\(\mathbf{x}_{i}\)</span> and <span class="math inline">\(\mathbf{x}_{j}\)</span> two different way based on
+two papers. From Ghashti, J. S. and Thompson, J. R. J. (2023), the
+kernel distance summation <span class="math inline">\(\texttt{dkps}\)</span> similarity is given by</p>
+<p><span class="math display">\[\begin{equation}\label{eq:kdsumsim}
+s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert
+\boldsymbol{\lambda}) = \prod_{k=1}^{p_c} \frac{1}{\lambda_k} K\left(
+\frac{x_{i,k} - x_{j,k}}{\lambda_k}\right)  + \sum_{k=p_c+1}^{p_c + p_u}
+L(x_{i,k},x_{j,k},\lambda_k) + \sum_{k = p_c+p_u+1}^p
+l(x_{i,k},x_{j,k},\lambda_k),
+\end{equation}\]</span></p>
+<p>and from Ghashti, J. S. (2024), the kernel summation similarity
+distance <span class="math inline">\(\texttt{kss}\)</span> is given
+by</p>
+<p><span class="math display">\[\begin{equation}\label{eq:dksssim}
+s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert
+\boldsymbol{\lambda}) = \sum_{k=1}^{p_c}  K\left( \frac{x_{i,k} -
+x_{j,k}}{\lambda_k}\right)  + \sum_{k=p_c+1}^{p_c + p_u}
+L(x_{i,k},x_{j,k},\lambda_k) + \sum_{k = p_c+p_u+1}^p
+l(x_{i,k},x_{j,k},\lambda_k).
+\end{equation}\]</span></p>
+<p>For both Equations (<span class="math inline">\(\ref{eq:kdsumsim}\)</span>) and (<span class="math inline">\(\ref{eq:dksssim}\)</span>), <span class="math inline">\(K(\cdot)\)</span>, <span class="math inline">\(L(\cdot)\)</span>, and <span class="math inline">\(\ell(\cdot)\)</span> are kernel functions for
+continuous, nominal (factor), and ordinal (ordered factor) variables,
+respectively. The data frame consists of <span class="math inline">\(p\)</span>-many variables, where <span class="math inline">\(p = p_c + p_u + p_o\)</span> indicating the total
+of the continuous, nominal, and ordinal variables, respectively. <span class="math inline">\(\boldsymbol{\lambda}\)</span> is a vector of
+length <span class="math inline">\(p\)</span> containing
+variable-specific bandwidth values from each kernel functions.</p>
+<p>Phillips, J. M., and Venkatasubramanian, S. (2011) discuss how to
+induce distance on similarity functions. Using either similarity
+function from Equations (<span class="math inline">\(\ref{eq:kdsumsim}\)</span>) or (<span class="math inline">\(\ref{eq:dksssim}\)</span>), the kernel distance
+between two observations <span class="math inline">\(\mathbf{x}_i\)</span> and <span class="math inline">\(\mathbf{x}_j\)</span> is given by</p>
+<p><span class="math display">\[\begin{equation}\label{eq:kerndist}
+  d^2(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) =
+s(\mathbf{x}_i, \mathbf{x}_i \ | \ \boldsymbol{\lambda}) +
+s(\mathbf{x}_j, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) -
+2s(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}).
+\end{equation}\]</span></p>
+<p>These two distance calculations can be called in <span class="math inline">\(\texttt{R}\)</span> with the package <span class="math inline">\(\texttt{kdml}\)</span> using functions <span class="math inline">\(\texttt{dkps}\)</span> for Equation (<span class="math inline">\(\ref{eq:kdsumsim}\)</span>) and <span class="math inline">\(\texttt{dkss}\)</span> for Equation (<span class="math inline">\(\ref{eq:dksssim}\)</span>), both of which are used
+in the Equation (<span class="math inline">\(\ref{eq:kerndist}\)</span>)
+for pairwise distance calculations.</p>
+<p>The vector of bandwidths <span class="math inline">\(\boldsymbol{\lambda}\)</span> may user-input
+numeric vectors of length <span class="math inline">\(p\)</span>, for
+which the bandwidths for each variable type is within the prespecified
+ranges. For continuous variables <span class="math inline">\(\lambda
+&gt; 0\)</span>, ordinal variables <span class="math inline">\(\lambda
+\in [0,1]\)</span>, and nominal variables is kernel specific. For
+example, <span class="math inline">\(\lambda \in [0,1]\)</span> for the
+‘u_aitken’ kernel and <span class="math inline">\(\lambda \in
+[0,(c-1)/c]\)</span> for ‘u_aitchisonaitken’, where <span class="math inline">\(c\)</span> is the number of unique values for a
+specific nominal variable. For an overview of kernel functions, we refer
+the reader to Aitchison, J. and Aitken C.G.G. (1976), Cameron, A. and
+Trivedi, P. (2005), Härdle, W. et al. (2004), Li, Q. and Racine, J.S,
+(2007), Li, Q. and Racine, J.S, (2003), Silverman, B.W. (1986),
+Titterington, D.M. and Bowman, A.W. (1985), and Wang, M.C. and van
+Ryzin, J. (1981).</p>
+</div>
+<div id="installing" class="section level1">
+<h1>Installing</h1>
+<p>You can install the released version of from <a href="https://github.com/jrjthompson/R-package-kdml">Github</a>
+with:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">&quot;jrjthompson/R-package-kdml&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(kdml)</span></code></pre></div>
+</div>
+<div id="bandwidth-selection" class="section level1">
+<h1>Bandwidth Selection</h1>
+<p>The maximization procedure for bandwidth specification is based on
+the objective</p>
+<p><span class="math display">\[\begin{equation}\label{eq:mscv}
+  \underset{\boldsymbol{\lambda}}{\text{argmax}}\left\{\frac{1}{n}\sum_{i=1}^n\log\left(\frac{1}{(n-1)}\sum_{\substack{j=1
+\\ j \ne i}}^n
+s_{\boldsymbol{\lambda}}(\textbf{x}_i,\textbf{x}_j)\right)\right\},
+\end{equation}\]</span></p>
+<p>where <span class="math inline">\(s_{\boldsymbol{\lambda}}(\cdot)\)</span> is either
+of the similarity functions from Equations (<span class="math inline">\(\ref{eq:kdsumsim}\)</span>) and (<span class="math inline">\(\ref{eq:dksssim}\)</span>). This bandwidth
+optimization technique, called maximum-similarity cross-validation
+(MSCV) and be invoked directly within the distance calculation by
+setting the argument <span class="math inline">\(\texttt{bw =
+&quot;mscv&quot;}\)</span> in the functions <span class="math inline">\(\texttt{dkps}\)</span> and <span class="math inline">\(\texttt{dkss}\)</span>.</p>
+<p>Users also have the option of setting the argument <span class="math inline">\(\texttt{bw = &quot;np&quot;}\)</span> to specify
+bandwidth selection using maximum-likelihood cross-validation from the
+high optimized package <span class="math inline">\(\texttt{np}\)</span>
+(Racine, J. S., and Hayfield, T., 2023).</p>
+<div id="sample-usage" class="section level2">
+<h2>Sample Usage</h2>
+<p>We simulate a mix of continuous (<span class="math inline">\(x_1\)</span>, <span class="math inline">\(x_4\)</span>), nominal (<span class="math inline">\(x_2\)</span>, <span class="math inline">\(x_3\)</span>), and ordinal data (<span class="math inline">\(x_5\)</span>, <span class="math inline">\(x_6\)</span>) an store in a data frame as
+follows</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x1 =</span> <span class="fu">runif</span>(<span class="dv">100</span>, <span class="dv">0</span>, <span class="dv">100</span>),</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">x2 =</span> <span class="fu">factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">x3 =</span> <span class="fu">factor</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;A&quot;</span>, <span class="st">&quot;B&quot;</span>, <span class="st">&quot;C&quot;</span>), <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>)),</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">x4 =</span> <span class="fu">rnorm</span>(<span class="dv">100</span>, <span class="dv">10</span>, <span class="dv">3</span>),</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">x5 =</span> <span class="fu">ordered</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;Low&quot;</span>, <span class="st">&quot;Medium&quot;</span>, <span class="st">&quot;High&quot;</span>), <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>               <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Low&quot;</span>, <span class="st">&quot;Medium&quot;</span>, <span class="st">&quot;High&quot;</span>)),</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">x6 =</span> <span class="fu">ordered</span>(<span class="fu">sample</span>(<span class="fu">c</span>(<span class="st">&quot;Low&quot;</span>, <span class="st">&quot;Medium&quot;</span>, <span class="st">&quot;High&quot;</span>), <span class="dv">100</span>, <span class="at">replace =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">&quot;Low&quot;</span>, <span class="st">&quot;Medium&quot;</span>, <span class="st">&quot;High&quot;</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>Minimal implementation requires only the data frame, where the
+functions default the kernel functions, and the bandwidth specification
+method to ‘mscv’.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># DKPS distance (Equation 1 and 3)</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>dis_dkps <span class="ot">&lt;-</span> <span class="fu">dkps</span>(<span class="at">df =</span> df)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># DKSS distance (Equations 2 and 3)</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>dis_kdss <span class="ot">&lt;-</span> <span class="fu">kdss</span>(<span class="at">df =</span> df)</span></code></pre></div>
+<p>Using the maximum-likelihood cross-validation technique from package
+<span class="math inline">\(\texttt{np}\)</span>.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># DKPS distance (Equation 1 and 3)</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>dis_dkps_np <span class="ot">&lt;-</span> <span class="fu">dkps</span>(<span class="at">df =</span> df, <span class="at">bw =</span> <span class="st">&quot;np&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># DKSS distance (Equations 2 and 3)</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>dis_kdss_np <span class="ot">&lt;-</span> <span class="fu">kdss</span>(<span class="at">df =</span> df, <span class="at">bw =</span> <span class="st">&quot;np&quot;</span>)</span></code></pre></div>
+<p>Users also have many kernel functions available them, which are
+listed in the additional arguments below. Some of the kernel functions
+are not available with <span class="math inline">\(\texttt{np}\)</span>,
+and kernels used for the bandwidth specification technique should be the
+same used for the distance calculation</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dis_dkps_custom_kernels <span class="ot">&lt;-</span> <span class="fu">dkss</span>(<span class="at">df =</span> df, <span class="at">bw =</span> <span class="st">&quot;mscv&quot;</span>, </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">cFUN =</span> <span class="st">&quot;c_epanechnikov&quot;</span>, <span class="at">uFUN =</span> <span class="st">&quot;u_aitken&quot;</span>, <span class="at">oFUN =</span> <span class="st">&quot;o_habbema&quot;</span>)</span></code></pre></div>
+<p>If users require only the bandwidths specified from the MSCV formula
+in Equation (<span class="math inline">\(\ref{eq:mscv}\)</span>), and
+not the pairwise distance matrix obtained from <span class="math inline">\(\texttt{dkps}\)</span> or <span class="math inline">\(\texttt{dkss}\)</span>, they may do so with the
+following function calls:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># MSCV bandwidth specification using the similarity function in Equation (1)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mscv.dkps</span>(df, <span class="at">nstart =</span> <span class="cn">NULL</span>, <span class="at">ckernel =</span> <span class="st">&quot;c_gaussian&quot;</span>, </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>           <span class="at">ukernel =</span> <span class="st">&quot;u_aitken&quot;</span>, <span class="at">okernel =</span> <span class="st">&quot;o_wangvanryzin&quot;</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>) </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co"># MSCV bandwidth specification using the similarity function in Equation (2)</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mscv.dkss</span>(df, <span class="at">nstart =</span> <span class="cn">NULL</span>, <span class="at">ckernel =</span> <span class="st">&quot;c_gaussian&quot;</span>, </span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>          <span class="at">ukernel =</span> <span class="st">&quot;u_aitken&quot;</span>, <span class="at">okernel =</span> <span class="st">&quot;o_wangvanryzin&quot;</span>, <span class="at">verbose =</span> <span class="cn">TRUE</span>) </span></code></pre></div>
+<p>Arguments for the <span class="math inline">\(\texttt{dkps}\)</span>
+and <span class="math inline">\(\texttt{dkss}\)</span> functions:</p>
+<ul>
+<li><span class="math inline">\(\texttt{df}\)</span>: a <span class="math inline">\(p\)</span>-variate data frame for which the
+pairwise distances between observations will be calculated. The data
+types may be continuous, nominal (unordered factors), ordinal (ordered
+factors), or any combination thereof. Columns of <span class="math inline">\(\texttt{df}\)</span> should be of appropriate
+variable type prior to running the function.</li>
+<li><span class="math inline">\(\texttt{bw}\)</span>: a bandwidth
+specification method. This can be set as a vector of <span class="math inline">\(p\)</span>-many bandwidths, with each element
+<span class="math inline">\(i\)</span> corresponding to the bandwidth
+for column <span class="math inline">\(i\)</span> in <span class="math inline">\(\texttt{df}\)</span>. Alternatively, one of two
+character strings may be inputted for bandwidth selection methods. <span class="math inline">\(\texttt{mscv}\)</span> specifies
+maximum-similarity cross-validation, and <span class="math inline">\(\texttt{np}\)</span> specifies likelihood-cross
+validation which is calculated via <span class="math inline">\(\texttt{npudensbw}\)</span> in package <span class="math inline">\(\texttt{np}\)</span>. Defaults to <span class="math inline">\(\texttt{mscv}\)</span>.</li>
+<li><span class="math inline">\(\texttt{cFUN}\)</span>: character string
+specifying the continuous kernel function. Options include <span class="math inline">\(\texttt{c\_gaussian}\)</span>, <span class="math inline">\(\texttt{c\_epanechnikov}\)</span>, <span class="math inline">\(\texttt{c\_uniform}\)</span>, <span class="math inline">\(\texttt{c\_triangle}\)</span>, <span class="math inline">\(\texttt{c\_biweight}\)</span>, <span class="math inline">\(\texttt{c\_triweight}\)</span>, <span class="math inline">\(\texttt{c\_tricube}\)</span>, <span class="math inline">\(\texttt{c\_cosine}\)</span>, <span class="math inline">\(\texttt{c\_logistic}\)</span>, <span class="math inline">\(\texttt{c\_sigmoid}\)</span>, and <span class="math inline">\(\texttt{c\_silverman}\)</span>. Note that if using
+<span class="math inline">\(\texttt{np}\)</span> for <span class="math inline">\(\texttt{bw}\)</span> selection above, continuous
+kernel types are restricted to either <span class="math inline">\(\texttt{c\_gaussian}\)</span>, <span class="math inline">\(\texttt{c\_epanechnikov}\)</span>, or <span class="math inline">\(\texttt{c\_uniform}\)</span>. Defaults to <span class="math inline">\(\texttt{c\_gaussian}\)</span>.</li>
+<li><span class="math inline">\(\texttt{uFUN}\)</span>: character string
+specifying the nominal kernel function for unordered factors. Options
+include <span class="math inline">\(\texttt{u\_aitken}\)</span> and
+<span class="math inline">\(\texttt{u\_aitchisonaitken}\)</span>.
+Defaults to <span class="math inline">\(\texttt{u\_aitken}\)</span>.</li>
+<li><span class="math inline">\(\texttt{oFUN}\)</span>: character string
+specifying the ordinal kernel function for ordered factors. Options
+include <span class="math inline">\(\texttt{o\_aitken}\)</span>, <span class="math inline">\(\texttt{o\_aitchisonaitken}\)</span>, <span class="math inline">\(\texttt{o\_habbema}\)</span>, <span class="math inline">\(\texttt{o\_wangvanryzin}\)</span>, and <span class="math inline">\(\texttt{o\_liracine}\)</span>. Note that if using
+<span class="math inline">\(\texttt{np}\)</span> for <span class="math inline">\(\texttt{bw}\)</span> selection above, ordinal
+kernel types are restricted to either <span class="math inline">\(\texttt{o\_wangvanryzin}\)</span> or <span class="math inline">\(\texttt{o\_liracine}\)</span>. Defaults to <span class="math inline">\(\texttt{o\_wangvanryzin}\)</span>.</li>
+<li><span class="math inline">\(\texttt{stan}\)</span>: a logical value
+which specifies whether to scale the resulting distance matrix between
+<span class="math inline">\(0\)</span> and <span class="math inline">\(1\)</span> using min-max normalization. If set to
+<span class="math inline">\(\texttt{FALSE}\)</span>, there is no
+normalization. Defaults to <span class="math inline">\(\texttt{TRUE}\)</span>.</li>
+</ul>
+<p>The resulting outputs are the following:</p>
+<ul>
+<li><span class="math inline">\(\texttt{distances}\)</span>: an <span class="math inline">\(n \times n\)</span> numeric matrix containing
+pairwise distances between observations.</li>
+<li><span class="math inline">\(\texttt{bandwidths}\)</span>: a <span class="math inline">\(p\)</span>-variate vector of bandwidth values
+returned based on the bw bandwidth specification method, sorted by
+variable type.</li>
+</ul>
+<p><strong>References</strong></p>
+<p>[1] Aitchison, J. and C.G.G. Aitken (1976), “Multivariate binary
+discrimination by the kernel method,” Biometrika, 63, 413-420.</p>
+<p>[2] Cameron, A. and P. Trivedi (2005), “Microeconometrics: Methods
+and Applications”, Cambridge University Press.</p>
+<p>[3] Ghashti, J.S. (2024), Similarity Maximization and Shrinkage
+Approach in Kernel Metric Learning for Clustering Mixed-type Data (T),
+University of British Columbia.</p>
+<p>[4] Ghashti, J.S. and J.R.J Thompson (2023), “Mixed-type Distance
+Shrinkage and Selection for Clustering via Kernel Metric Learning.”
+arXiv preprint arXiv:2306.01890.</p>
+<p>[5] Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004),
+Nonparametric and Semiparametric Models, (Vol. 1). Berlin: Springer.</p>
+<p>[6] Hayfield, T. and J.S. Racine (2008). Nonparametric Econometrics:
+The np Package. Journal of Statistical Software 27(5).</p>
+<p>[7] Li, Q. and J.S. Racine (2007), Nonparametric Econometrics: Theory
+and Practice, Princeton University Press.</p>
+<p>[8] Li, Q. and J.S. Racine (2003), “Nonparametric estimation of
+distributions with categorical and continuous data,” Journal of
+Multivariate Analysis, 86, 266-292.</p>
+<p>[9] Silverman, B.W. (1986), Density Estimation, London: Chapman and
+Hall.</p>
+<p>[10] Titterington, D.M. and A.W. Bowman (1985), “A comparative study
+of smoothing procedures for ordered categorical data”, Journal of
+Statistical Computation and Simulation, 21(3-4), 291-312.</p>
+<p>[11] Wang, M.C. and J. van Ryzin (1981), “A class of smooth
+estimators for discrete distributions,” Biometrika, 68, 301-309.</p>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
