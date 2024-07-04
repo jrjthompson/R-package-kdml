@@ -6,7 +6,7 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
-vignette: "%\\VignetteEngine{knitr::knitr} %\\VignetteIndexEntry{absorber package}
+vignette: "%\\VignetteEngine{knitr::knitr} %\\VignetteIndexEntry{kdml package}
   %\\VignetteEncoding{UTF-8}\n"
 ---
 
@@ -15,7 +15,7 @@ knitr::opts_chunk$set(message = FALSE,warning = FALSE)
 library(np)
 library(stats)
 library(MASS)
-# library(kss) rename once we know the file
+# library(kdml) rename once we know the file
 library(ggplot2)
 ```
 
