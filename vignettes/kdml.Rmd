@@ -1,5 +1,5 @@
 ---
-title: "kss package"
+title: "kdml package"
 author: "John R. J. Thompson & Jesse S. Ghashti"
 date: ' '
 output:
