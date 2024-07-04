@@ -10,7 +10,5 @@ install_github("jrjthompson/R-package-kdml")
 
 library(kdml)
 
-A PDF overview of the package can be found in the link below.
 
-## READ ME FILE
 
