@@ -71,7 +71,7 @@ dkps <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
     c_logistic = function(A, B, bws, C) {sum((1/bws)*1 / (exp((A - B) / bws) + 2 + exp(-((A - B) / bws))))}, #Continuous logistic kernel
     c_sigmoid = function(A, B, bws, C) {sum((1/bws)*2 / (pi * (exp((A - B) / bws) + exp(-((A - B) / bws)))))}, #Continuous Sigmoid kernel
     c_silverman = function(A, B, bws, C) {sum(1/bws*0.5 * exp(-abs((A-B)/bws) / sqrt(2)) * sin(abs((A-B)/bws) / sqrt(2) + pi/4))}, #Continuous Silverman Kernel
-    u_aitchisonaitken = function(A, B, bws, C) {sum(ifelse(A == B, 1 - bws, bws / (length(unique(C[,i])) - 1)))}, #Nominal Aitchison and Aitken kernel
+    u_aitchisonaitken = function(A, B, bws, C) {sum(ifelse(A == B, 1 - bws, bws / (length(unique(C)) - 1)))}, #Nominal Aitchison and Aitken kernel
     u_aitken = function(A, B, bws, C) {sum(ifelse(A == B, 1, bws))}, #Nominal Aitken kernel
     o_wangvanryzin = function(A, B, bws, C) {sum(ifelse(A == B, 1 - bws, (1/2) * (1 - bws) * (bws^abs(A - B))))}, #Ordinal Wang & van Ryzin kernel
     o_aitchisonaitken = function(A, B, bws, C) {sum(ifelse(A == B, 1, bws^(abs(A - B))))}, #Ordinal Aitchison and Aitken kernel
