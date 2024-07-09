@@ -4,7 +4,7 @@
 Mixed-type Data Generation with True Membership Labels
 }
 \description{
-This function generates a mixed-type data frame with a combination of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables with prespecified cluster overlap for each variable type. \code{confactord} is flexible, as the user may specify the number of each variable type, the amount of variables per variable type that have cluster overlap, the amount of cluster overlap for each variable type, the number of levels for the nominal and ordinal variables, and proportion of observations per class membership. Within and across-type variables are generated independently from one another. Currently, only
+This function generates a mixed-type data frame with a combination of numeric (continuous), factor (nominal), and ordered (ordinal) variables with prespecified cluster overlap for each variable type. \code{confactord} is flexible, as the user may specify the number of each variable type, the amount of variables per variable type that have cluster overlap, the amount of cluster overlap for each variable type, the number of levels for the nominal and ordinal variables, and proportion of observations per class membership. Within and across-type variables are generated independently from one another. Currently, only
 }
 \usage{
 confactord(n = 200, 
