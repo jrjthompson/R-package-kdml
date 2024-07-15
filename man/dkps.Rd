@@ -1,7 +1,7 @@
 \name{dkps}
 \alias{dkps}
 \title{
-Kernel Summation Distance (DKPA) through Kernel Metric Learning for Mixed-type Data
+Distance using Kernel Product Similarity (DKPS) for Mixed-type Data
 }
 \description{
 This function calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables using the method described in Ghashti, J. S. and Thompson, J. R. J (2023). This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.
