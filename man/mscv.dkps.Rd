@@ -1,7 +1,7 @@
 \name{mscv.dkps}
 \alias{mscv.dkps}
 \title{
-Maximum-similarity Cross-validated (MSCV) bandwidth specification method for the Distance with Kernel Product Similarities (DKPS)
+Maximum-similarity Cross-validated (MSCV) bandwidth specification method for the Distance using Kernel Product Similarities (DKPS)
 }
 \description{
 This function calculates maximum-similarity cross-validated bandwidths for data frames consisting of mixed-type observations including numeric (continuous), factor (nominal), and ordered factor (ordinal) variables, using the method described in Ghashti and Thompson (2023). \code{mscv.dkps} learns the bandwidths for each kernel function for each variable type and returns a numeric vector of bandwidths that can be utilized with the \code{dkps} pairwise distance calculation.
