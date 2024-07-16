@@ -1,7 +1,7 @@
 \name{mscv.dkss}
 \alias{mscv.dkss}
 \title{
-Maximum-similarity Cross-validated (MSCV) bandwidth specification method for the Kernel Summation Similarity Distance (DKSS)
+Maximum-similarity Cross-validated (MSCV) bandwidth specification method for the Distance using Kernel Summation Similarity (DKSS)
 }
 \description{
 This function calculates maximum-similarity cross-validated bandwidths for data frames consisting of mixed-type observations including numeric (continuous), factor (nominal), and ordered factor (ordinal) variables, using the method described in Ghashti (2024). \code{mscv.dkss} learns the bandwidths associated with each kernel function for each variable type and returns a numeric vector of bandwidths that can be utilized with the \code{dkss} pairwise distance calculation.
