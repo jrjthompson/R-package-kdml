@@ -31,7 +31,7 @@ dkps(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 }
 }
 \details{
-  \code{dkps} implements the kernel summation distance (DKPS) as described by Ghashti and Thompson (2023). This approach uses product kernels for continuous variables, and summation kernels for nominal and ordinal data, which are then summed over all variable types to return the pairwise distance between mixed-type data. 
+  \code{dkps} implements the distance using kernel product similarity (DKPS) as described by Ghashti and Thompson (2023). This approach uses product kernels for continuous variables, and summation kernels for nominal and ordinal data, which are then summed over all variable types to return the pairwise distance between mixed-type data. 
   
   Each kernel requires a bandwidth specification, which can either be a user defined numeric vector of length \eqn{p} from alternative methodologies for bandwidth selection, or through two bandwidth specification methods. The \code{mscv} bandwidth selection routine is based on the maximum-similarity cross-validation routine by Ghashti and Thompson (2023), invoked by the function \code{\link{mscv.dkps}}. The \code{np} bandwidth selection routine follows maximum-likelihood cross-validation techniques described by Li and Racine (2007) and Li and Racine (2003) for kernel density estimation of mixed-type data. Bandwidths will differ for each variable.
 
