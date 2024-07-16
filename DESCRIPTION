@@ -1,14 +1,13 @@
 Package: kdml
 Type: Package
 Title: Kernel Distance Metric Learning for Mixed-Type Data
-Version: 1.0
-Date: 2024-07-03
-Authors@R: c(person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre")),
-           person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut"))
-Author: John R. J. Thompson [aut, cre],
-  Jesse S. Ghashti [aut]
+Version: 1.0.0
+Date: 2024-07-16
+Authors@R: c(person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut"),
+             person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre"))\)
+Author: Jesse S. Ghashti [aut], John R. J. Thompson [aut, cre]
 Maintainer: John R. J. Thompson <john.thompson@ubc.ca>
-Description: Calculates the pairwise distances between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables. This kernel metric learning methodology learns the bandwidths associated with each kernel function for each variable type and returns a distance matrix that can be utilized in any distance-based clustering algorithm.. For further details we refer the reader to the papers Ghashti, J. S. (2024), <doi:10.14288/1.0443975> and Ghashti, J. S. and Thompson, J. R. J. (2023), <doi:10.48550/arXiv.2306.01890>.
+Description: Distance metrics between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables. This methodology utilizes additive and product mixed-type kernels to calculate metrics that are flexible for any mixed-type dataset. Bandwidths associated with each kernel function are selected via Maximum Similarity Cross-validation. These methods return a distance matrix that can be utilized in any distance-based algorithm, but are particularly useful for clustering. For further details, we refer the reader to Ghashti and Thompson (2023) <doi:10.1145/3604237.3626849>  and Ghashti, J. S. and Thompson, J. R. J. (2023) <doi:10.48550/arXiv.2306.01890> for <<tt>>dkps<<\tt>>, and Ghashti (2024), <doi:10.14288/1.0443975> for <<tt>>dkss<</tt>>.
 License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.5.0), np
