@@ -1,4 +1,4 @@
-You can install the released version of kss from Github with:
+You can install the development version of the <tt>kdml</tt> package from Github with:
 
 ## INSTALLATION
 
