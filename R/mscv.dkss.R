@@ -153,7 +153,7 @@ mscv.dkss <- function(df, nstart = NULL, ckernel = "c_gaussian",
     }
   }
   if(verbose == TRUE) ifelse(best_obj$convergence == 0, print("Objective converged"), print("Objective did not converge."))
-  bw <- data.frame(x = round(best_obj$par, 6))
+  bw <- data.frame(x = best_obj$par)
   rownames(bw) <- colnames(df[, c(con_cols, fac_cols, ord_cols)])
   return(list(bw = bw, fn_value = best_obj$value))
 }
