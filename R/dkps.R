@@ -53,7 +53,7 @@ dkps <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   if(length(bws) != ncol(df)) stop("Invalid length of bandwidth vector (bw).")
   if(any(bws[1:con_ind] <= 0)) stop("Continuous bandwidths must be > 0")
   if(fac_ind > 0 && any(bws[(con_ind + 1):fac_ind] > 1)) warning("Nominal bandwidths should be between 0 and 1")
-  if(ord_ind > 0 && any(bws[(fac_ind + 1):ord_ind] > 1)) warning("Ordinal bandwidths should be between 0 and 1") 
+  if(ord_ind > 0 && any(bws[(con_ind + fac_ind + 1):ord_ind] > 1)) warning("Ordinal bandwidths should be between 0 and 1") 
   
   distances <- matrix(0, nrow = nrow(df), ncol = nrow(df))
   combinations <- combn(nrow(df), 2)
@@ -94,7 +94,7 @@ dkps <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   }
   d_c <- if (con_ind > 0) compute_distance(get_function(cFUN, "cFUN"), 1:con_ind) else 0
   d_u <- if (fac_ind > 0) compute_distance(get_function(uFUN, "uFUN"), (con_ind + 1):fac_ind) else 0
-  d_o <- if (ord_ind > 0) compute_distance(get_function(oFUN, "oFUN"), (fac_ind + 1):ord_ind) else 0
+  d_o <- if (ord_ind > 0) compute_distance(get_function(oFUN, "oFUN"), (con_ind + fac_ind + 1):ord_ind) else 0
   return(d_c + d_u + d_o)
 }
   for (i in 1:ncol(combinations)) {
