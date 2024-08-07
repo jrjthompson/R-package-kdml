@@ -1,5 +1,5 @@
 export("dkps", "dkss", "mscv.dkps", "mscv.dkss") 
-import(MASS, stats)
+import(MASS, stats, markdown)
 importFrom("np", "npudensbw")
 importFrom("utils", "combn")
 
