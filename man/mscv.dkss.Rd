@@ -14,7 +14,7 @@ for variable types and returns a numeric vector of bandwidths that can be used
 with the \code{dkss} pairwise distance calculation.
 }
 \usage{
-mscv.dkss(df, nstart = 5, ckernel = "c_gaussian", ukernel = "u_aitken", 
+mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken", 
           okernel = "o_wangvanryzin", verbose = TRUE) 
 }
 \arguments{

@@ -9,8 +9,8 @@ This package provides nonparametric kernel methods for calculating pairwise
 distances between mixed-type observations.  A numeric pairwise distance matrix 
 is returned for. These methods can be used in any distance based algorithm, 
 with emphasis place on usage in clustering or classification applications. 
-Descriptions of the implementation of these methods can be found in Ghashti, 
-J.S. (2024) and Ghashti, J.S. and Thompson, J.R.J. (2023).
+Descriptions of the implementation of these methods can be found in Ghashti 
+ (2024) and Ghashti and Thompson (2023).
 
 }
 

@@ -12,6 +12,7 @@ of numeric (continuous), factor (nominal), and ordered factor (ordinal)
 variables. \code{mscv.dkps} calculates the bandwidths associated with each 
 kernel function for variable types and returns a numeric vector of bandwidths 
 that can be used with the \code{dkps} pairwise distance calculation.
+}
 
 \usage{
 mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
