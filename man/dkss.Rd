@@ -29,8 +29,8 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    column \eqn{i} in \code{df}. Alternatively, one of two character strings may 
    be inputted for bandwidth selection methods. \code{mscv} specifies maximum 
    similarity cross-validation, and \code{np} specifies likelihood-cross 
-   validation which is calculated via \code{\link{npudensbw}} in package 
-   \code{\link{np}}. Defaults to \code{mscv}. See details.
+   validation which is calculated via \code{\link[np]{npudensbw}} in package 
+   \code{\link[np]{np}}. Defaults to \code{mscv}. See details.
 }
   \item{cFUN}{
    character string specifying the continuous kernel function. Options include 
