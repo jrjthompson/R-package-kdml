@@ -150,8 +150,7 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 
 
 \seealso{
- \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}, 
- \code{\link{npudensbw}}
+ \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}
 }
 \examples{
 \donttest{
