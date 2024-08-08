@@ -12,7 +12,7 @@ License: GPL-2
 Encoding: UTF-8
 Depends: R (>= 3.5.0), np
 Imports: MASS, markdown
-Suggests: knitr
+Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2024-07-04 22:23:12 UTC; jesseghashti
