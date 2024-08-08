@@ -93,7 +93,6 @@ confactord(n = 200,
 }
 
 \examples{
-\donttest{
 # EXAMPLE1: Default implementation generates the following
 # 200 observations split into two clusters of equal size (100 observations each) 
 # Three variables-- one of each numeric, factor, and ordered
@@ -120,7 +119,6 @@ df2 <- confactord(n = 500,
                     numMixVarOl = c(1,2,1),  
                     olVarType = c(0.2,0.3,0.4), 
                     catLevels = c(3,5))
-}
 }
 
 
