@@ -93,7 +93,7 @@ confactord(n = 200,
 }
 
 \examples{
-\dontrun{
+\donttest{
 # EXAMPLE1: Default implementation generates the following
 # 200 observations split into two clusters of equal size (100 observations each) 
 # Three variables-- one of each numeric, factor, and ordered

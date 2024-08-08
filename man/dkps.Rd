@@ -91,7 +91,7 @@ dkps(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
  \code{\link{mscv.dkps}}, \code{\link{dkss}}, \code{\link{mscv.dkss}}
 }
 \examples{
-\dontrun{
+\donttest{
 # example data frame with mixed numeric, nominal, and ordinal data.
 levels = c("Low", "Medium", "High")
 df <- data.frame(
