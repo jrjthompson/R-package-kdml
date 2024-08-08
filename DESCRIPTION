@@ -1,18 +1,14 @@
 Package: kdml
-Type: Package
 Title: Kernel Distance Metric Learning for Mixed-Type Data
 Version: 1.0.0
-Date: 2024-07-16
 Authors@R: c(person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut"),
              person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre")))
-Author: Jesse S. Ghashti [aut], John R. J. Thompson [aut, cre]
 Maintainer: John R. J. Thompson <john.thompson@ubc.ca>
-Description: Distance metrics between mixed-type observations consisting of numeric (continuous), factor (nominal), and ordered factor (ordinal) variables. This methodology utilizes additive and product mixed-type kernels to calculate metrics that are flexible for any mixed-type dataset. Bandwidths associated with each kernel function are selected via Maximum Similarity Cross-validation. These methods return a distance matrix and are designed for distance-based clustering, but can be tuned for any algorithm requiring a distance matrix. For further details, we refer the reader to Ghashti and Thompson (2023) <doi:10.1145/3604237.3626849>  and Ghashti, J. S. and Thompson, J. R. J. (2023) <doi:10.48550/arXiv.2306.01890> for <<tt>>dkps<<\tt>>, and Ghashti (2024), <doi:10.14288/1.0443975> for <<tt>>dkss<</tt>>.
-License: GPL-2
+Description: Distance metrics for mixed-type data consisting of continuous, nominal, and ordinal variables. This methodology uses additive and product kernels to calculate similarity functions and metrics and selects variables relevant to the underlying distance through bandwidth selection via maximum similarity cross-validation. These methods can be used in any distance-based algorithm, such as distance-based clustering. For further details, we refer the reader to: Ghashti and Thompson (2024) <doi:10.48550/arXiv.2306.01890> for <<tt>>dkps<<\tt>> methodology, and Ghashti (2024), <doi:10.14288/1.0443975> for <<tt>>dkss<</tt>> methodology.
+License: GPL (>= 2)
 Encoding: UTF-8
 Depends: R (>= 3.5.0), np
 Imports: MASS, markdown
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
 NeedsCompilation: no
-Packaged: 2024-07-04 22:23:12 UTC; jesseghashti
