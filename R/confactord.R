@@ -1,4 +1,4 @@
-confactord = function(n = 200, 
+confactord <- function(n = 200, 
                         popProb = c(0.5,0.5), 
                         numMixVar = c(1,1,1), 
                         numMixVarOl = c(1,1,1),  
@@ -44,11 +44,11 @@ confactord = function(n = 200,
     }
   }
   for (i in 1:length(pops)) memb[sample(which(memb == 0), exco[i])] <- i
-  
+
+  centres = c(0,-2*qnorm(ol/2))
+  cV = centres[memb]
   # Continuous variables
   if(dimCon > 0){
-    centres = c(0,-2*qnorm(ol/2))
-    cV = centres[memb]
     # generate continuous variables
     conV = matrix(rnorm(n*dimCon,mean=cV,sd=1), nrow=n, ncol=dimCon)
     # consider user inputted cluster overlap for continuous variables and calculate variance for overlaps
