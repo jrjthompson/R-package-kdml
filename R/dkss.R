@@ -51,9 +51,6 @@ dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   df <- data.matrix(df)
   
   if(length(bws) != ncol(df)) stop("Invalid length of bandwidth vector (bw).")
-  if(any(bws[1:con_ind] <= 0)) stop("Continuous bandwidths must be > 0")
-  if(fac_ind > 0 && any(bws[(con_ind + 1):fac_ind] > 1)) warning("Nominal bandwidths should be between 0 and 1")
-  if(ord_ind > 0 && any(bws[(con_ind + fac_ind + 1):ord_ind] > 1)) warning("Ordinal bandwidths should be between 0 and 1") 
   
   distances <- matrix(0, nrow = nrow(df), ncol = nrow(df))
   combinations <- combn(nrow(df), 2)
