@@ -7,7 +7,7 @@ Distance using Kernel Product Similarities (DKPS)
 \description{
 This function calculates maximum-similarity cross-validated bandwidths for the 
 distance using kernel summation similarity. This implementation uses the method 
-described in Ghashti and Thompson (2023) for mixed-type data that includes any 
+described in Ghashti and Thompson (2024) for mixed-type data that includes any 
 of numeric (continuous), factor (nominal), and ordered factor (ordinal) 
 variables. \code{mscv.dkps} calculates the bandwidths associated with each 
 kernel function for variable types and returns a numeric vector of bandwidths 
@@ -62,7 +62,7 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
 \details{
   \code{mscv.dkps} implements the maximum-similarity cross-validation (MSCV) 
   technique for bandwidth selection pertaining to the \code{\link{dkps}} function,
-  as described by Ghashti and Thompson (2023). This approach uses product kernels 
+  as described by Ghashti and Thompson (2024). This approach uses product kernels 
   for continuous variables, and summation kernels for nominal and ordinal data,
   which are then summed over all variable types to return the pairwise distance 
   between mixed-type data. 
@@ -114,9 +114,9 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
   Cameron, A. and P. Trivedi (2005), \dQuote{Microeconometrics: Methods and 
   Applications}, Cambridge University Press.
 
-  Ghashti, J.S. and J.R.J Thompson (2023), \dQuote{Mixed-type Distance Shrinkage
-  and Selection for Clustering via Kernel Metric Learning. Journal of 
-  Classification, Accepted.}
+  Ghashti, J.S. and J.R.J Thompson (2024), \dQuote{Mixed-type Distance Shrinkage
+  and Selection for Clustering via Kernel Metric Learning.} Journal of 
+  Classification, Accepted.
   
   Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), 
   \emph{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.

@@ -7,9 +7,10 @@ Distance using Kernel Summation Similarity (DKSS) for Mixed-type Data
 This function calculates the pairwise distances between mixed-type observations 
 consisting of continuous (\code{numeric}), nominal (\code{factor}), and ordinal 
 (\code{ordered}) variables using the method described in Ghashti (2024). 
-This kernel metric learning methodology learns the bandwidths associated with 
-each kernel function for each variable type and returns a distance matrix that 
-can be utilized in any distance-based clustering algorithm.
+This kernel metric learning methodology calculates a kernel sum similarity 
+function, with a variety of options for kernel functions associated with each 
+variable type and returns a distance matrix that can be used in any distance-
+based algorithm.
 }
 \usage{
 dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", 
@@ -24,16 +25,16 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
     variable type prior to running the function.
 }
   \item{bw}{
-   a bandwidth specification method. This can be set as a vector of \eqn{p}-many
-   bandwidths, with each element \eqn{i} corresponding to the bandwidth for 
-   column \eqn{i} in \code{df}. Alternatively, one of two character strings may 
-   be inputted for bandwidth selection methods. \code{mscv} specifies maximum 
-   similarity cross-validation, and \code{np} specifies likelihood-cross 
-   validation which is calculated via \code{\link[np]{npudensbw}} in package 
-   \code{\link[np]{np}}. Defaults to \code{mscv}. See details.
+   numeric bandwidth vector of length \eqn{p}, with each element \eqn{i} 
+   corresponding to the bandwidth for column \eqn{i} in \code{df}. 
+   Alternatively, one of two character strings may be inputted for bandwidth 
+   selection methods. \code{mscv} specifies maximum-similarity cross-validation,
+   and \code{np} specifies likelihood-cross validation which is calculated using 
+   \code{\link[np]{npudensbw}} in package \code{\link[np]{np}}. Defaults to 
+   \code{mscv}. See details.
 }
   \item{cFUN}{
-   character string specifying the continuous kernel function. Options include 
+   character value specifying the continuous kernel function. Options include 
    \code{c_gaussian}, \code{c_epanechnikov}, \code{c_uniform}, 
    \code{c_triangle}, \code{c_biweight}, \code{c_triweight}, \code{c_tricube}, 
    \code{c_cosine}, \code{c_logistic}, \code{c_sigmoid}, and \code{c_silverman}. 
@@ -42,22 +43,22 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    \code{c_uniform}. Defaults to \code{c_gaussian}. See details.
 }
  \item{uFUN}{
-   character string specifying the nominal kernel function for unordered 
+   character value specifying the nominal kernel function for unordered 
    factors. Options include \code{u_aitken} and \code{u_aitchisonaitken}. 
    Defaults to \code{u_aitken}. See details.
 }
  \item{oFUN}{
-   character string specifying the ordinal kernel function for ordered factors.
+   character value specifying the ordinal kernel function for ordered factors.
    Options include \code{o_aitken}, \code{o_aitchisonaitken}, \code{o_habbema}, 
    \code{o_wangvanryzin}, and \code{o_liracine}. Note that if using \code{np} 
    for \code{bw} selection above, ordinal kernel types are restricted to either
-   \code{o_wangvanryzin} or \code{o_liracine}. Defaults to 
-   \code{o_wangvanryzin}. See details.
+   \code{o_wangvanryzin} or \code{o_liracine}. Defaults to \code{o_wangvanryzin}. 
+   See details.
 }
  \item{stan}{
    a logical value which specifies whether to scale the resulting distance 
    matrix between 0 and 1 using min-max normalization. If set to \code{FALSE}, 
-   there is no normalization. Defaults to \code{TRUE}.
+   distances are unscaled. Defaults to \code{TRUE}.
 }
 }
 \details{
@@ -66,31 +67,30 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
   continuous, nominal and ordinal data, which are then summed over all variable 
   types to return the pairwise distance between mixed-type data. 
   
+  There are several kernels to select from. The continuous kernel functions may 
+  be found in Cameron and Trivedi (2005), Härdle et al. (2004) or Silverman 
+  (1986). Nominal kernels use a variation on Aitchison and Aitken's (1976) 
+  kernel, while ordinal kernels use a variation of the Wang and van Ryzin (1981)
+  kernel. Both nominal and ordinal kernel functions can be found in Li and 
+  Racine (2007), Li and Racine (2003), Ouyan et al. (2006), and Titterington and
+  Bowman (1985).
+  
   Each kernel requires a bandwidth specification, which can either be a user 
   defined numeric vector of length \eqn{p} from alternative methodologies for 
-  bandwidth selection, or through two bandwidth specification methods. The 
-  \code{mscv} bandwidth selection routine is based on the maximum similarity 
-  cross-validation routine by Ghashti (2024), invoked by the function 
-  \code{\link{mscv.dkss}}. The \code{np} bandwidth selection routine follows 
-  maximum likelihood cross-validation techniques described by Li and Racine 
-  (2007) and Li and Racine (2003) for kernel density estimation of mixed-type 
-  data. Bandwidths will differ for each variable.
+  bandwidth selection, or through two bandwidth selection methods can be 
+  specified. The \code{mscv} bandwidth selection is based on maximum similarity 
+  cross-validation by Ghashti and Thompson (2024), invoked by the function 
+  \code{\link{mscv.dkss}}. The \code{np} bandwidth selection follows the maximum
+  likelihood cross-validation method described by Li and Racine (2007) and Li 
+  and Racine (2003) for kernel density estimation of mixed-type data. 
 
   Data contained in the data frame \code{df} may constitute any combinations of 
   continuous, nominal, or ordinal data, which is to be specified in the data 
   frame \code{df} using \code{\link{factor}} for nominal data, and 
-  \code{\link{ordered}} for ordinal data. Data can be entered in an arbitrary 
-  order and  data types will be detected automatically. User-inputted vectors of
-  bandwidths \code{bw} must be defined in the same order as the variables in the
-  data frame \code{df}, as to ensure they sorted accordingly by the routine.
-
-  The are many kernels which can be specified by the user. The continuous kernel 
-  functions may be found in Cameron and Trivedi (2005), Härdle  et al. (2004) 
-  or Silverman (1986). Nominal kernels use a variation on Aitchison and 
-  Aitken's (1976) kernel, while ordinal kernels use a variation of  the Wang 
-  and van Ryzin (1981) kernel. Both nominal and ordinal kerne functions can 
-  be found in Li and Racine (2007), Li and Racine (2003), Ouyan et al. (2006), 
-  and Titterington and Bowman (1985).
+  \code{\link{ordered}} for ordinal data. Data types can be in any order and 
+  will be detected automatically. User-inputted vectors of
+  bandwidths \code{bw} must be specified in the same order as the variables in 
+  the data frame \code{df}, as to ensure they sorted accordingly by the routine.
 }
 
 \value{

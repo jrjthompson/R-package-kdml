@@ -112,9 +112,9 @@ mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
   Cameron, A. and P. Trivedi (2005), \dQuote{Microeconometrics: Methods and 
   Applications}, Cambridge University Press.
 
-   Ghashti, J.S. (2024), \emph{Similarity Maximization and Shrinkage Approach 
-   in Kernel Metric Learning for Clustering Mixed-type Data}, University of 
-   British Columbia.
+  Ghashti, J.S. (2024), \emph{Similarity Maximization and Shrinkage Approach 
+  in Kernel Metric Learning for Clustering Mixed-type Data}, University of 
+  British Columbia.
   
   Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), 
   \emph{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
@@ -127,8 +127,8 @@ mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
   of Multivariate Analysis, 86, 266-292.
 
   Ouyang, D. and Q. Li and J.S. Racine (2006), \dQuote{Cross-validation
-    and the estimation of probability distributions with categorical
-    data,} Journal of Nonparametric Statistics, 18, 69-100.
+  and the estimation of probability distributions with categorical
+  data,} Journal of Nonparametric Statistics, 18, 69-100.
 
   Silverman, B.W. (1986), \emph{Density Estimation,} London: Chapman and
   Hall.
@@ -138,7 +138,7 @@ mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
   Computation and Simulation, 21(3-4), 291-312.
 
   Wang, M.C. and J. van Ryzin (1981), \dQuote{A class of smooth estimators
-   for discrete distributions,}  Biometrika, 68, 301-309.
+  for discrete distributions,}  Biometrika, 68, 301-309.
 
 }
 \author{
