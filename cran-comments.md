@@ -21,6 +21,16 @@ This is a new submission to CRAN.
   Maintainer: 'John R. J. Thompson <john.thompson@ubc.ca>'
   
   New submission
+  
+  Possibly misspelled words in DESCRIPTION:
+    Ghashti (7:472, 7:539)
+    dkps (7:510)
+    dkss (7:590)
+    tt (7:506, 7:517, 7:586, 7:597)
+    
+These are not misspellings.
 
 ❯ checking HTML version of manual ... NOTE
   Skipping checking math rendering: package 'V8' unavailable
+
+This is not a problem associated with this package. 
