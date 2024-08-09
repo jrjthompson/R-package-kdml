@@ -39,15 +39,15 @@ and from Ghashti (2024), the distance using kernel summation similarity \(\textt
 s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda}) = \sum_{k=1}^{p_c}  K\left( \frac{x_{i,k} - x_{j,k}}{\lambda_k}\right)  + \sum_{k=p_c+1}^{p_c + p_u} L(x_{i,k},x_{j,k},\lambda_k) + \sum_{k = p_c+p_u+1}^p l(x_{i,k},x_{j,k},\lambda_k).
 \end{equation}
 
-For both Equations (\ref{eq:kdsumsim}) and (\ref{eq:dksssim}), $K(\cdot)$, $L(\cdot)$, and $\ell(\cdot)$ are kernel functions for continuous (numeric), nominal (factor), and ordinal (ordered factor) variables, respectively. The data frame consists of $p$-many variables, such that $p = p_c + p_u + p_o$ is the sum of the continuous, nominal, and ordinal variables, respectively. $\boldsymbol{\lambda}$ is a vector of length $p$ containing variable-specific bandwidth values for each kernel function. 
+For both $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, $K(\cdot)$, $L(\cdot)$, and $\ell(\cdot)$ are kernel functions for continuous (numeric), nominal (factor), and ordinal (ordered factor) variables, respectively. The data frame consists of $p$-many variables, such that $p = p_c + p_u + p_o$ is the sum of the continuous, nominal, and ordinal variables, respectively. $\boldsymbol{\lambda}$ is a vector of length $p$ containing variable-specific bandwidth values for each kernel function. 
 
-Phillips and Venkatasubramanian (2011) discuss how to calculate distance from similarity functions. Using either similarity function from Equations (\ref{eq:kdsumsim}) or (\ref{eq:dksssim}), the kernel distance between two observations $\mathbf{x}_i$ and $\mathbf{x}_j$ is given by 
+Phillips and Venkatasubramanian (2011) discuss how to calculate distance from similarity functions. Using either similarity function from  $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ or $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, the kernel distance between two observations $\mathbf{x}_i$ and $\mathbf{x}_j$ is given by 
 
 \begin{equation}\label{eq:kerndist}
   d^2(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) = s(\mathbf{x}_i, \mathbf{x}_i \ | \ \boldsymbol{\lambda}) + s(\mathbf{x}_j, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) - 2s(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}).
 \end{equation}
 
-These two distances can be called in \(\texttt{R}\) with the package \(\texttt{kdml}\) using functions \(\texttt{dkps}\) for Equation (\ref{eq:kdsumsim}) and \(\texttt{dkss}\) for Equation (\ref{eq:dksssim}), both of which are used in the Equation (\ref{eq:kerndist}) for pairwise distance calculations.
+These two distances can be called in \(\texttt{R}\) with the package \(\texttt{kdml}\) using functions \(\texttt{dkps}\) for Equation $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and \(\texttt{dkss}\) for Equation $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, both of which are used in the Equation $d^2(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda})$ for pairwise distance calculations.
 
 The vector of bandwidths $\boldsymbol{\lambda}$ may be a user-input numeric vector of length $p$, for which the possible values for bandwidths for each variable type are bounded based on the kernel choice. For continuous variables $\lambda > 0$, ordinal variables $\lambda \in [0,1]$, and nominal variables is kernel specific. For example, $\lambda \in [0,1]$ for the 'u_aitken' kernel and $\lambda \in [0,(c-1)/c]$ for 'u_aitchisonaitken', where $c$ is the number of unique values for a specific nominal variable. For an overview of kernel functions, we refer the reader to Aitchison and Aitken (1976), Cameron and Trivedi (2005), Härdle et al. (2004), Li and Racine (2007), Li and Racine (2003), Silverman (1986), Titterington and Bowman (1985), and Wang and van Ryzin (1981).
 
@@ -68,7 +68,7 @@ The maximum similarity cross-validation (MSCV) method for bandwidth selection (G
   \underset{\boldsymbol{\lambda}}{\text{argmax}}\left\{\frac{1}{n}\sum_{i=1}^n\log\left(\frac{1}{(n-1)}\sum_{\substack{j=1 \\ j \ne i}}^n s_{\boldsymbol{\lambda}}(\textbf{x}_i,\textbf{x}_j)\right)\right\},
 \end{equation}
  
-  where $s_{\boldsymbol{\lambda}}(\cdot)$ is as the similarity function for Equations (\ref{eq:kdsumsim}) and (\ref{eq:dksssim}). (MSCV) can be invoked implicitly within the distance calculation by setting the argument \(\texttt{bw = "mscv"}\) in the functions \(\texttt{dkps}\) and \(\texttt{dkss}\). Users also have the option of setting the argument \(\texttt{bw = "np"}\) to specify bandwidth selection using maximum-likelihood cross-validation from the highly optimized package \(\texttt{np}\) (Hayfield and Racine, 2008).
+  where $s_{\boldsymbol{\lambda}}(\cdot)$ is as the similarity function for  $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$. (MSCV) can be invoked implicitly within the distance calculation by setting the argument \(\texttt{bw = "mscv"}\) in the functions \(\texttt{dkps}\) and \(\texttt{dkss}\). Users also have the option of setting the argument \(\texttt{bw = "np"}\) to specify bandwidth selection using maximum-likelihood cross-validation from the highly optimized package \(\texttt{np}\) (Hayfield and Racine, 2008).
 
 # Data Generation
 
@@ -91,20 +91,20 @@ df <- data.frame(
 A minimial usage of the distance metrics functions requires only the data frame, where the functions default the kernel functions, and the bandwidth specification method to 'mscv'.
 
 ```{r, echo = TRUE, eval = FALSE}
-# DKPS distance (Equation 1 and 3)
+# DKPS distance 
 dis_dkps <- dkps(df = df)
 
-# DKSS distance (Equations 2 and 3)
+# DKSS distance 
 dis_kdss <- kdss(df = df)
 ```
 
 Using the maximum-likelihood cross-validation technique from package \(\texttt{np}\).
 
 ```{r, echo = TRUE, eval = FALSE}
-# DKPS distance (Equation 1 and 3)
+# DKPS distance 
 dis_dkps_np <- dkps(df = df, bw = "np")
 
-# DKSS distance (Equations 2 and 3)
+# DKSS distance 
 dis_kdss_np <- kdss(df = df, bw = "np")
 ```
 
@@ -115,7 +115,7 @@ dis_dkps_custom_kernels <- dkss(df = df, bw = "mscv",
     cFUN = "c_epanechnikov", uFUN = "u_aitken", oFUN = "o_habbema")
 ```
 
-If users require only the bandwidths specified from the MSCV formula in Equation (\ref{eq:mscv}), and not the pairwise distance matrix obtained from \(\texttt{dkps}\) or \(\texttt{dkss}\), they may do so with the following function calls:
+If users require only the bandwidths selected by MSCV, and not the pairwise distance matrix obtained from \(\texttt{dkps}\) or \(\texttt{dkss}\), they may do so with the following function calls:
 
 ```{r, echo = TRUE, eval = FALSE}
 # MSCV bandwidth specification using the similarity function in Equation (1)
