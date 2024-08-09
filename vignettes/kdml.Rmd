@@ -131,13 +131,13 @@ For more details on the usage of each of these functions, consult the package do
 
 **References**
 
-[1] Aitchison, J. and C.G.G. Aitken (1976), “Multivariate binary discrimination by the kernel method,” Biometrika, 63, 413-420.
+[1] Aitchison, J. and C.G.G. Aitken (1976), “Multivariate binary discrimination by the kernel method”, Biometrika, 63, 413-420.
 
 [2] Cameron, A. and P. Trivedi (2005), “Microeconometrics: Methods and Applications”, Cambridge University Press.
 
-[3] Ghashti, J.S. (2024), Similarity Maximization and Shrinkage Approach in Kernel Metric Learning for Clustering Mixed-type Data (T), University of British Columbia.
+[3] Ghashti, J.S. (2024), "Similarity Maximization and Shrinkage Approach in Kernel Metric Learning for Clustering Mixed-type Data", University of British Columbia.
 
-[4] Ghashti, J.S. and J.R.J Thompson (2023), “Mixed-type Distance Shrinkage and Selection for Clustering via Kernel Metric Learning.” arXiv preprint arXiv:2306.01890.
+[4] Ghashti, J.S. and J.R.J Thompson (2024), “Mixed-type Distance Shrinkage and Selection for Clustering via Kernel Metric Learning”, Journal of Classification, Accepted.
 
 [5] Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), Nonparametric and Semiparametric Models, (Vol. 1). Berlin: Springer.
 
@@ -145,10 +145,10 @@ For more details on the usage of each of these functions, consult the package do
 
 [7] Li, Q. and J.S. Racine (2007), Nonparametric Econometrics: Theory and Practice, Princeton University Press.
 
-[8] Li, Q. and J.S. Racine (2003), “Nonparametric estimation of distributions with categorical and continuous data,” Journal of Multivariate Analysis, 86, 266-292.
+[8] Li, Q. and J.S. Racine (2003), “Nonparametric estimation of distributions with categorical and continuous data”, Journal of Multivariate Analysis, 86, 266-292.
 
 [9] Silverman, B.W. (1986), Density Estimation, London: Chapman and Hall.
 
 [10] Titterington, D.M. and A.W. Bowman (1985), “A comparative study of smoothing procedures for ordered categorical data”, Journal of Statistical Computation and Simulation, 21(3-4), 291-312.
 
-[11] Wang, M.C. and J. van Ryzin (1981), “A class of smooth estimators for discrete distributions,” Biometrika, 68, 301-309.
+[11] Wang, M.C. and J. van Ryzin (1981), “A class of smooth estimators for discrete distributions”, Biometrika, 68, 301-309.
