@@ -1,10 +1,10 @@
-dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN = "o_wangvanryzin", stan = TRUE) {
+dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE) {
   v_ck <- c("c_gaussian", "c_epanechnikov", "c_uniform", "c_triangle",
             "c_biweight", "c_triweight", "c_tricube", "c_cosine", 
             "c_logistic", "c_sigmoid", "c_silverman")
   v_uk <- c("u_aitken", "u_aitchisonaitken")
   v_ok <- c("o_wangvanryzin", "o_habbema", "o_aitken", "o_aitchisonaitken", "o_liracine")
-  
+  verb <- verbose
   if (!(cFUN %in% v_ck)) stop("Invalid cFUN specified. Choose one of: ", paste(v_ck, collapse = ", "))
   if (!(uFUN %in% v_uk)) stop("Invalid uFUN specified. Choose one of: ", paste(v_uk, collapse = ", "))
   if (!(oFUN %in% v_ok)) stop("Invalid oFUN specified. Choose one of: ", paste(v_ok, collapse = ", "))
@@ -20,8 +20,8 @@ dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   if (is.numeric(bw)) {
     bws <- bw[match(c(con_cols, fac_cols, ord_cols), names(df))]
   } else if (bw == "mscv") {
-    bws <- as.numeric(mscv.dkss(df, nstart = min(3, ncol(df)), ckernel = cFUN, ukernel = uFUN, okernel = oFUN, verbose = TRUE)$bw[,1])
-    print("Bandwidth calculation complete. Computing distances.")
+    bws <- as.numeric(mscv.dkss(df, nstart = min(3, ncol(df)), ckernel = cFUN, ukernel = uFUN, okernel = oFUN, verbose = verb)$bw[,1])
+    if(verb == TRUE) print("Bandwidth calculation complete. Computing distances.")
   } else if (bw == "np") {
     if (cFUN == "c_gaussian") cker <- "gaussian"
     if (cFUN == "c_epanechnikov") cker <- "epanechnikov"
@@ -36,8 +36,8 @@ dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
     if (oFUN %in% c("o_habbema", "o_aitken", "o_aitchisonaitken")) {
       stop("Choose one of o_wangvanryzin or o_liracine for ordinal kernels while using np")
     }
-    bws <- npudensbw(df_ordered, ckertype = cker, ukertype = uker, okertype = oker, bwmethod = "cv.ml")$bw
-    print("Bandwidth calculation complete. Computing distances.")
+    ifelse(verb == TRUE, bws <- npudensbw(df_ordered, ckertype = cker, ukertype = uker, okertype = oker, bwmethod = "cv.ml")$bw, invisible(capture.output(bws <- npudensbw(df_ordered, ckertype = cker, ukertype = uker, okertype = oker, bwmethod = "cv.ml")$bw)))
+    if(verb == TRUE) print("Bandwidth calculation complete. Computing distances.")
   } else {
     stop("Invalid bandwidth selection. Input either a numeric vector of bandwidths, or choose 'np' or 'mscv'.")
   }
@@ -104,18 +104,15 @@ dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN =
   bandwidths <- matrix(bws, 1, length(bws))
   colnames(bandwidths) <- colnames(df_ordered)
   if (stan == FALSE) {
-    print("Completed distance calculation.")
+    if (verb == TRUE) print("Completed distance calculation.")
     return(list(distances = distances, bandwidths = bandwidths))
   }
   if (stan == TRUE) {
     min <- min(distances)
     max <- max(distances)
     standardized <- (distances - min) / (max - min)
-    print("Completed distance calculation.")
+    if(verb == TRUE) print("Completed distance calculation.")
     return(list(distances = standardized, bandwidths = bandwidths))
   }
 }
-
-
-
-
+  
