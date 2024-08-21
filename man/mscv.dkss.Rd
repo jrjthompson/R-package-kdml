@@ -15,7 +15,7 @@ with the \code{dkss} pairwise distance calculation.
 }
 \usage{
 mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken", 
-          okernel = "o_wangvanryzin", verbose = TRUE) 
+          okernel = "o_wangvanryzin", verbose = FALSE) 
 }
 \arguments{
   \item{df}{
@@ -55,7 +55,7 @@ mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
  \item{verbose}{
    a logical value which specifies whether to output the \eqn{i}-th iteration of
    the total number of \code{nstarts}, and output if the optimization procedure 
-   converges. Defaults to \code{TRUE}.
+   converges. Defaults to \code{FALSE}.
 }
 }
 \details{
