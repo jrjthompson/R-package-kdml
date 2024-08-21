@@ -60,9 +60,9 @@ dkps(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    matrix between 0 and 1 using min-max normalization. If set to \code{FALSE}, 
    distances are unscaled. Defaults to \code{TRUE}.
 }
- \item{verbose}{
+\item{verbose}{
    a logical value which specifies whether to print procedural steps to the console. If set to \code{FALSE}, 
-   distances are unscaled. Defaults to \code{FALSE}.
+   no output is printed to the console. Defaults to \code{FALSE}.
 }
 }
 \details{
