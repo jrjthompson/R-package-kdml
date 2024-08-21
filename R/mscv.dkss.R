@@ -1,9 +1,10 @@
 mscv.dkss <- function(df, nstart = NULL, ckernel = "c_gaussian",
-                       ukernel = "u_aitken", okernel = "o_wangvanryzin", verbose = TRUE) {
+                      ukernel = "u_aitken", okernel = "o_wangvanryzin", verbose = FALSE) {
   if (is.null(nstart)) {
     nstart <- ifelse(ncol(df) > 4, 3, ncol(df))
     message("No nstart value given, defaulting to ", nstart)
   }
+  verb <- verbose
   v_ck <- c("c_gaussian", "c_epanechnikov", "c_uniform", "c_triangle",
             "c_biweight", "c_triweight", "c_tricube", "c_cosine", 
             "c_logistic", "c_sigmoid", "c_silverman")
@@ -132,7 +133,7 @@ mscv.dkss <- function(df, nstart = NULL, ckernel = "c_gaussian",
   max_fail <- 7
   fail_cnt <- 0
   for (i in 1:nstart) {
-    if (verbose == TRUE) print(paste0("start ", i, " of ", nstart))
+    if (verb == TRUE) print(paste0("start ", i, " of ", nstart))
     params <- runif(N, 1e-16, 1)
     while (TRUE) {
       tryCatch({
@@ -141,9 +142,9 @@ mscv.dkss <- function(df, nstart = NULL, ckernel = "c_gaussian",
       }, error = function(e) {
         fail_cnt <<- fail_cnt + 1
         if (fail_cnt >= max_fail) {
-          stop("Too many optimization failures, please try different kernel functions or transforming variables that may be on a different scale")
+          stop("Too many optimization failures, try different kernel functions or transforming variables that may be on a different scale")
         }
-        print("Optimization failed, trying again...")
+        if(verb == TRUE) print("Optimization failed, trying again...")
       })
     }
     
@@ -152,7 +153,7 @@ mscv.dkss <- function(df, nstart = NULL, ckernel = "c_gaussian",
       best_obj <- result
     }
   }
-  if(verbose == TRUE) ifelse(best_obj$convergence == 0, print("Objective converged"), print("Objective did not converge."))
+  if(verb == TRUE) ifelse(best_obj$convergence == 0, print("Objective converged"), print("Objective did not converge."))
   bw <- data.frame(x = best_obj$par)
   rownames(bw) <- colnames(df[, c(con_cols, fac_cols, ord_cols)])
   return(list(bw = bw, fn_value = best_obj$value))
