@@ -14,7 +14,7 @@ based algorithm.
 }
 \usage{
 dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", 
-    oFUN = "o_wangvanryzin", stan = TRUE)
+    oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE)
 }
 \arguments{
   \item{df}{
@@ -59,6 +59,10 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    a logical value which specifies whether to scale the resulting distance 
    matrix between 0 and 1 using min-max normalization. If set to \code{FALSE}, 
    distances are unscaled. Defaults to \code{TRUE}.
+}
+ \item{verbose}{
+   a logical value which specifies whether to print procedural steps to the console. If set to \code{FALSE}, 
+   no output is printed to the console. Defaults to \code{FALSE}.
 }
 }
 \details{
