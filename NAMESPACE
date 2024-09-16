@@ -1,4 +1,4 @@
-export("dkps", "dkss", "mscv.dkps", "mscv.dkss", "confactord") 
+export("dkps", "dkss", "mscv.dkps", "mscv.dkss", "confactord", "kss", "spectral.clust") 
 import(MASS, stats, markdown)
 importFrom("np", "npudensbw")
 importFrom("utils", "combn","capture.output")
