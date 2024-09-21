@@ -54,7 +54,7 @@ received the following note:
   dkps      24.92   2.15   27.64
   mscv.dkss 21.05   2.67   23.77
   
-These times are > 5 sec, and thus we kept the \donttest in the manual file.s
+These times are > 5 sec, and thus we kept the \donttest{} in the manual file.
 
 ## Test environments
 
@@ -67,22 +67,19 @@ These times are > 5 sec, and thus we kept the \donttest in the manual file.s
   - Ubuntu 22.04.4 LTS-R version 4.4.1 (2024-06-14)
   - Windows Server 2022 x64 (build 20348)-R version 4.4.1 (2024-06-14)
 
-## R CMD check results
+## R CMD check results (Aug 21)
 
 0 errors | 0 warnings | 2 notes
 
-❯ checking CRAN incoming feasibility ... [10s] NOTE
+❯ checking CRAN incoming feasibility ... [23s] NOTE
   Maintainer: 'John R. J. Thompson <john.thompson@ubc.ca>'
   
   New submission
   
   Possibly misspelled words in DESCRIPTION:
-    Ghashti (7:472, 7:539)
-    dkps (7:510)
-    dkss (7:590)
-    tt (7:506, 7:517, 7:586, 7:597)
-    
-These are not misspellings.
+    Ghashti (7:472, 7:562)
+
+This is not a misspelling.
 
 ❯ checking HTML version of manual ... NOTE
   Skipping checking math rendering: package 'V8' unavailable
