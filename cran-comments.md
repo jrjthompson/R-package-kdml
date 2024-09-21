@@ -16,17 +16,7 @@ This is an update to the kdml package, adding two new functions "kss" and
 
 ## R CMD check results (Aug 21)
 
-0 errors | 0 warnings | 2 notes
-
-❯ checking CRAN incoming feasibility ... [23s] NOTE
-  Maintainer: 'John R. J. Thompson <john.thompson@ubc.ca>'
-  
-  New submission
-  
-  Possibly misspelled words in DESCRIPTION:
-    Ghashti (7:472, 7:562)
-
-This is not a misspelling.
+0 errors ✔ | 0 warnings ✔ | 1 note ✖
 
 ❯ checking HTML version of manual ... NOTE
   Skipping checking math rendering: package 'V8' unavailable
