@@ -61,8 +61,9 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    distances are unscaled. Defaults to \code{TRUE}.
 }
  \item{verbose}{
-   a logical value which specifies whether to print procedural steps to the console. If set to \code{FALSE}, 
-   no output is printed to the console. Defaults to \code{FALSE}.
+   a logical value which specifies whether to print procedural steps to the 
+   console. If set to \code{FALSE}, no output is printed to the console. 
+   Defaults to \code{FALSE}.
 }
 }
 \details{
@@ -112,30 +113,30 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 \references{
 
   Aitchison, J. and  C.G.G. Aitken (1976), \dQuote{Multivariate binary 
-  discrimination by the kernel method,} Biometrika, 63, 413-420.
+  discrimination by the kernel method}, Biometrika, 63, 413-420.
   
   Cameron, A. and P. Trivedi (2005), \dQuote{Microeconometrics: Methods and 
   Applications}, Cambridge University Press.
   
-  Ghashti, J.S. (2024), \emph{Similarity Maximization and Shrinkage Approach 
+  Ghashti, J.S. (2024), \dQuote{Similarity Maximization and Shrinkage Approach 
   in Kernel Metric Learning for Clustering Mixed-type Data (T)}, University of 
   British Columbia.
   
   Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), 
-  \emph{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
+  \dQuote{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
   
-  Li, Q. and J.S. Racine (2007), \emph{Nonparametric Econometrics: Theory
-  and Practice,} Princeton University Press.
+  Li, Q. and J.S. Racine (2007), \dQuote{Nonparametric Econometrics: Theory
+  and Practice}, Princeton University Press.
 
   Li, Q. and J.S. Racine (2003), \dQuote{Nonparametric estimation of
-   distributions with categorical and continuous data,} Journal
+   distributions with categorical and continuous data}, Journal
   of Multivariate Analysis, 86, 266-292.
 
   Ouyang, D. and Q. Li and J.S. Racine (2006), \dQuote{Cross-validation
     and the estimation of probability distributions with categorical
-    data,} Journal of Nonparametric Statistics, 18, 69-100.
+    data}, Journal of Nonparametric Statistics, 18, 69-100.
 
-  Silverman, B.W. (1986), \emph{Density Estimation,} London: Chapman and
+  Silverman, B.W. (1986), \dQuote{Density Estimation}, London: Chapman and
   Hall.
   
   Titterington, D.M. and A.W. Bowman (1985), \dQuote{A comparative study of 
@@ -144,7 +145,7 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
   Computation and Simulation, 21(3-4), 291-312.
 
   Wang, M.C. and J. van Ryzin (1981), \dQuote{A class of smooth estimators
-   for discrete distributions,}  Biometrika, 68, 301-309.
+   for discrete distributions},  Biometrika, 68, 301-309.
 
 }
 \author{

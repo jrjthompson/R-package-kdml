@@ -32,12 +32,12 @@ for mixed-type data generation.
 }
 \references{
 
-     Ghashti, J.S. (2024), \emph{Similarity Maximization and Shrinkage Approach 
+     Ghashti, J.S. (2024), \dQuote{Similarity Maximization and Shrinkage Approach 
      in Kernel Metric Learning for Clustering Mixed-type Data (T)}, University 
      of British Columbia. <https://dx.doi.org/10.14288/1.044397>
 
      Ghashti, J.S. and J.R.J Thompson (2024), \dQuote{Mixed-type Distance 
-     Shrinkage and Selection for Clustering via Kernel Metric Learning.} 
+     Shrinkage and Selection for Clustering via Kernel Metric Learning}. 
      Journal of Classification, Accepted. 
 
 

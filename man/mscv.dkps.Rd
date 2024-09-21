@@ -7,7 +7,7 @@ Distance using Kernel Product Similarities (DKPS)
 \description{
 This function calculates maximum-similarity cross-validated bandwidths for the 
 distance using kernel summation similarity. This implementation uses the method 
-described in Ghashti and Thompson (2024) for mixed-type data that includes any 
+described in Ghashti and Thompson (2023) for mixed-type data that includes any 
 of numeric (continuous), factor (nominal), and ordered factor (ordinal) 
 variables. \code{mscv.dkps} calculates the bandwidths associated with each 
 kernel function for variable types and returns a numeric vector of bandwidths 
@@ -56,13 +56,13 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
  \item{verbose}{
    a logical value which specifies whether to output the \eqn{i}-th iteration of
    the total number of \code{nstarts}, and output if the optimization procedure 
-   converges. Defaults to \code{FALSE}.
+   converges. Defaults to \code{TRUE}.
 }
 }
 \details{
   \code{mscv.dkps} implements the maximum-similarity cross-validation (MSCV) 
   technique for bandwidth selection pertaining to the \code{\link{dkps}} function,
-  as described by Ghashti and Thompson (2024). This approach uses product kernels 
+  as described by Ghashti and Thompson (2023). This approach uses product kernels 
   for continuous variables, and summation kernels for nominal and ordinal data,
   which are then summed over all variable types to return the pairwise distance 
   between mixed-type data. 
@@ -109,30 +109,30 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
 \references{
 
   Aitchison, J. and  C.G.G. Aitken (1976), \dQuote{Multivariate binary 
-  discrimination by the kernel method,} Biometrika, 63, 413-420.
+  discrimination by the kernel method}, Biometrika, 63, 413-420.
   
   Cameron, A. and P. Trivedi (2005), \dQuote{Microeconometrics: Methods and 
   Applications}, Cambridge University Press.
 
-  Ghashti, J.S. and J.R.J Thompson (2024), \dQuote{Mixed-type Distance Shrinkage
-  and Selection for Clustering via Kernel Metric Learning.} Journal of 
-  Classification, Accepted.
+  Ghashti, J.S. and J.R.J Thompson (2023), \dQuote{Mixed-type Distance Shrinkage
+  and Selection for Clustering via Kernel Metric Learning. Journal of 
+  Classification, Accepted.}
   
   Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), 
-  \emph{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
+  \dQuote{Nonparametric and Semiparametric Models}, (Vol. 1). Berlin: Springer.
   
-  Li, Q. and J.S. Racine (2007), \emph{Nonparametric Econometrics: Theory
-  and Practice,} Princeton University Press.
+  Li, Q. and J.S. Racine (2007), \dQuote{Nonparametric Econometrics: Theory
+  and Practice}, Princeton University Press.
 
   Li, Q. and J.S. Racine (2003), \dQuote{Nonparametric estimation of
-   distributions with categorical and continuous data,} Journal
+   distributions with categorical and continuous data}, Journal
   of Multivariate Analysis, 86, 266-292.
 
   Ouyang, D. and Q. Li and J.S. Racine (2006), \dQuote{Cross-validation
     and the estimation of probability distributions with categorical
-    data,} Journal of Nonparametric Statistics, 18, 69-100.
+    data}, Journal of Nonparametric Statistics, 18, 69-100.
 
-  Silverman, B.W. (1986), \emph{Density Estimation,} London: Chapman and
+  Silverman, B.W. (1986), \dQuote{Density Estimation}, London: Chapman and
   Hall.
   
   Titterington, D.M. and A.W. Bowman (1985), \dQuote{A comparative study of 
@@ -140,7 +140,7 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
   Computation and Simulation, 21(3-4), 291-312.
 
   Wang, M.C. and J. van Ryzin (1981), \dQuote{A class of smooth estimators
-   for discrete distributions,}  Biometrika, 68, 301-309.
+   for discrete distributions},  Biometrika, 68, 301-309.
 
 }
 \author{
