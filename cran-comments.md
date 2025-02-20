@@ -1,7 +1,7 @@
+
 ## kdml -- Update 
 
-This is an update to the kdml package, adding two new functions "kss" and 
-"spectral.clust". 
+This is an update to the kdml package, correcting some bugs in the dkps, kss, and dkss functions. 
 
 ## Test environments
 

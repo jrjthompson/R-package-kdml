@@ -1,6 +1,6 @@
 Package: kdml
 Title: Kernel Distance Metric Learning for Mixed-Type Data
-Version: 1.1.0
+Version: 1.1.1
 Authors@R: c(person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6303-449X")),
              person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut",
