@@ -1,16 +1,22 @@
 Package: kdml
 Title: Kernel Distance Metric Learning for Mixed-Type Data
-Version: 1.1.1
+Version: 1.2.0
 Authors@R: c(person("John R. J.", "Thompson", email = "john.thompson@ubc.ca", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-6303-449X")),
              person("Jesse S.","Ghashti", email="jesse.ghashti@ubc.ca", role = "aut",
-           comment = c(ORCID = "0009-0001-6645-1766")))
+           comment = c(ORCID = "0009-0001-6645-1766")),
+             person("Daniel", "Krasnov", email = "daniel.krasnov@mail.mcgill.ca", role = "aut",
+           comment = c(ORCID = "0009-0003-4104-3162")))
 Maintainer: John R. J. Thompson <john.thompson@ubc.ca>
 Description: Distance metrics for mixed-type data consisting of continuous, nominal, and ordinal variables. This methodology uses additive and product kernels to calculate similarity functions and metrics, and selects variables relevant to the underlying distance through bandwidth selection via maximum similarity cross-validation. These methods can be used in any distance-based algorithm, such as distance-based clustering. For further details, we refer the reader to Ghashti and Thompson (2024) <doi:10.1007/s00357-024-09493-z> for dkps() methodology, and Ghashti (2024) <doi:10.14288/1.0443975> for dkss() methodology.
+    A portable C implementation provides Markov chain Monte Carlo selection of
+    feature-specific kernels and bandwidths for either distance definition.
 License: GPL (>= 2)
 Encoding: UTF-8
 Depends: R (>= 3.5.0), np
-Imports: MASS, markdown
+Imports: MASS, markdown, posterior (>= 1.4.0)
 Suggests: knitr, rmarkdown
 VignetteBuilder: knitr
-NeedsCompilation: no
+NeedsCompilation: yes
+SystemRequirements: OpenMP (optional, for parallel CPU MCMC sampler); NVIDIA CUDA
+    Toolkit and supported host compiler (optional, for MCMC sampler)

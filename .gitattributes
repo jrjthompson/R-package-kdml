@@ -1,0 +1,7 @@
+configure text eol=lf
+cleanup text eol=lf
+configure.win text eol=lf
+cleanup.win text eol=lf
+src/Makevars.cpu.in text eol=lf
+src/Makevars.in text eol=lf
+src/Makevars.win.in text eol=lf

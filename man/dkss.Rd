@@ -13,16 +13,18 @@ variable type and returns a distance matrix that can be used in any distance-
 based algorithm.
 }
 \usage{
-dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", 
-    oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE)
+dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
+    oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE,
+    kernels = NULL, state = c("map", "last"), chain = 1L,
+    draw = NULL, newdata = NULL)
 }
 \arguments{
   \item{df}{
-    a \eqn{p}-variate data frame for which the pairwise distances between 
-    observations will be calculated. The data types may be continuous 
-    (\code{numeric}), nominal (\code{factor}), and ordinal (\code{ordered}), 
-    or any combination thereof. Columns of \code{df} should be of appropriate 
-    variable type prior to running the function.
+    a \eqn{p}-variate data frame for which the pairwise distances between
+    observations will be calculated, or a \code{kdml_mcmc} object returned by
+    \code{\link{mcmc.dkss}}. Data-frame columns may be continuous
+    (\code{numeric}), nominal (\code{factor}), ordinal (\code{ordered}), or any
+    combination thereof.
 }
   \item{bw}{
    numeric bandwidth vector of length \eqn{p}, with each element \eqn{i} 
@@ -34,7 +36,8 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    \code{mscv}. See details.
 }
   \item{cFUN}{
-   character value specifying the continuous kernel function. Options include 
+   character value specifying the continuous kernel function, or a character
+   vector with one value per continuous feature. Options include
    \code{c_gaussian}, \code{c_epanechnikov}, \code{c_uniform}, 
    \code{c_triangle}, \code{c_biweight}, \code{c_triweight}, \code{c_tricube}, 
    \code{c_cosine}, \code{c_logistic}, \code{c_sigmoid}, and \code{c_silverman}. 
@@ -43,12 +46,14 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    \code{c_uniform}. Defaults to \code{c_gaussian}. See details.
 }
  \item{uFUN}{
-   character value specifying the nominal kernel function for unordered 
-   factors. Options include \code{u_aitken} and \code{u_aitchisonaitken}. 
+   character value specifying the nominal kernel function for unordered
+   factors, or a character vector with one value per nominal feature. Options
+   include \code{u_aitken} and \code{u_aitchisonaitken}.
    Defaults to \code{u_aitken}. See details.
 }
  \item{oFUN}{
-   character value specifying the ordinal kernel function for ordered factors.
+   character value specifying the ordinal kernel function for ordered factors,
+   or a character vector with one value per ordinal feature.
    Options include \code{o_aitken}, \code{o_aitchisonaitken}, \code{o_habbema}, 
    \code{o_wangvanryzin}, and \code{o_liracine}. Note that if using \code{np} 
    for \code{bw} selection above, ordinal kernel types are restricted to either
@@ -64,7 +69,27 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    a logical value which specifies whether to print procedural steps to the 
    console. If set to \code{FALSE}, no output is printed to the console. 
    Defaults to \code{FALSE}.
-}
+ }
+ \item{kernels}{
+   optional character vector containing one type-compatible kernel name per
+   feature. A named vector is matched to the columns of \code{df}; an unnamed
+   vector follows data-frame column order. This requires a numeric \code{bw}
+   vector. Do not combine it with \code{cFUN}, \code{uFUN}, or \code{oFUN}.
+ }
+ \item{state}{
+   state selected when \code{df} is an MCMC fit: \code{"map"} (the default)
+   or \code{"last"}.
+ }
+ \item{chain}{
+   chain selected with \code{state = "last"} or an explicit \code{draw}.
+ }
+ \item{draw}{
+   optional retained MCMC draw. Supplying it overrides \code{state}.
+ }
+ \item{newdata}{
+   optional data frame on which to calculate distances using a fitted MCMC
+   state. Its features and categorical levels must match the fitting data.
+ }
 }
 \details{
   \code{dkss} implements the distance using summation similarity distance (DKSS)
@@ -94,8 +119,16 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
   frame \code{df} using \code{\link{factor}} for nominal data, and 
   \code{\link{ordered}} for ordinal data. Data types can be in any order and 
   will be detected automatically. User-inputted vectors of
-  bandwidths \code{bw} must be specified in the same order as the variables in 
+  bandwidths \code{bw} must be specified in the same order as the variables in
   the data frame \code{df}, as to ensure they sorted accordingly by the routine.
+
+  When \code{df} is a fit returned by \code{mcmc.dkss}, \code{dkss} uses the
+  fit's sampled MAP state by default and preserves its feature-specific
+  kernels. Equivalently, users may pass \code{fit$map$bandwidth} as \code{bw}
+  and \code{fit$map$kernel} as \code{kernels} with the original data frame.
+  Feature-specific kernels are evaluated by the same compiled C implementation
+  used by the sampler. The original scalar \code{cFUN}, \code{uFUN}, and
+  \code{oFUN} interface remains available.
 }
 
 \value{
@@ -108,6 +141,10 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
  \item{bandwidths}{
  a \eqn{p}-variate vector of bandwidth values returned based on the \code{bw} 
  bandwidth specification method, sorted by variable type
+ }
+ \item{kernels}{
+ a named character vector of selected kernels when feature-specific kernels or
+ an MCMC fit are supplied
  }
 }
 \references{
@@ -196,6 +233,12 @@ d3 <- dkss(df = df, bw = bw_vec)
 # user-specific kernel functions example
 d5 <- dkss(df = df, bw = "mscv", cFUN = "c_epanechnikov", uFUN = "u_aitken", 
       oFUN = "o_habbema")
+
+\dontrun{
+fit <- mcmc.dkss(df, warmup = 500, draws = 1000)
+d6 <- dkss(fit)
+d7 <- dkss(df, bw = fit$map$bandwidth, kernels = fit$map$kernel)
+}
 }
 }
 

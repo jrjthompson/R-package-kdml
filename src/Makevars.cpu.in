@@ -1,0 +1,3 @@
+# CUDA support is disabled. The portable C backend is always available.
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CFLAGS)

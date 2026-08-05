@@ -1,0 +1,9 @@
+#!/bin/sh
+
+rm -f src/Makevars src/Makevars.win
+rm -f src/kdml_cuda_enabled
+rm -f src/kdml_cuda_loader.o src/kdml_cuda_loader.obj
+rm -f src/kdml.so src/kdml.dll src/kdml.dylib
+rm -f src/kdmlcuda.so src/kdmlcuda.dll src/kdmlcuda.dylib
+rm -f src/kdmlcuda.exe
+rm -f src/kdmlcuda.lib src/kdmlcuda.exp

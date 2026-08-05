@@ -1,154 +1,418 @@
 ---
-title: "kdml package"
-author: "John R. J. Thompson & Jesse S. Ghashti"
-date: ' '
+title: "Kernel Distance Metric Learning with kdml"
+author: "John R. J. Thompson, Jesse S. Ghashti, and Daniel Krasnov"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{kdml package}
+  %\VignetteIndexEntry{Kernel Distance Metric Learning with kdml}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(message = FALSE,warning = FALSE)
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  message = FALSE,
+  warning = FALSE,
+  cache = TRUE
 )
-library(np)
-library(stats)
-library(MASS)
 library(kdml)
 ```
-
 
 # Introduction
 
-The \(\texttt{kdml}\) package calculates the pairwise distances between mixed-type observations consisting of continuous (numeric), nominal (factor), and ordinal (ordered factor) variables. This kernel metric learning methodology calculates the bandwidths associated with each kernel function for each variable type using cross-validations and returns a distance matrix that can be utilized in any distance-based  algorithm.
+Distance-based clustering is widely used to group observations with mixed
+numeric and categorical features, using a predefined metric to quantify
+dissimilarity between data points. Many existing metrics for mixed-type data
+either convert continuous attributes to categorical attributes, or vice versa,
+and treat all variables as a single type, or calculate a distance for each
+variable separately and then combine the results. These approaches can discard
+information and allow irrelevant or poorly scaled variables to exert too much
+influence on the resulting dissimilarities.
 
-We define a kernel similarity between two data points $\mathbf{x}_{i}$ and $\mathbf{x}_{j}$ two different way based on two papers. From Ghashti and Thompson (2024), the distance using kernel product similarity \(\texttt{dkps}\) similarity is given by 
+Kernel distance metric learning (KDML) addresses this challenge by assigning a kernel to each feature based on its data type. Continuous kernels measure numerical differences, nominal kernels capture agreement between categories, and ordinal kernels account for the inherent ordering of categories. Each feature is assigned a bandwidth parameter that determines the extent to which differences in that feature contribute to the overall similarity. 
+As shown by Ghashti and Thompson (2025), KDML can be interpreted as a shrinkage method between maximum dissimilarity between all data
+points to uniform dissimilarity across data points (Ghashti and Thompson, 2025).
 
-\begin{equation}\label{eq:kdsumsim}
-s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda}) = \prod_{k=1}^{p_c} \frac{1}{\lambda_k} K\left( \frac{x_{i,k} - x_{j,k}}{\lambda_k}\right)  + \sum_{k=p_c+1}^{p_c + p_u} L(x_{i,k},x_{j,k},\lambda_k) + \sum_{k = p_c+p_u+1}^p l(x_{i,k},x_{j,k},\lambda_k),
-\end{equation}
+For observations \(\mathbf{x}_i\) and \(\mathbf{x}_j\), let \(p_c\), \(p_u\),
+and \(p_o\) denote the numbers of continuous, nominal, and ordinal features,
+with \(p=p_c+p_u+p_o\). We define two similarity functions, the kernel product similarity
 
-and from Ghashti (2024), the distance using kernel summation similarity \(\texttt{kss}\) is given by 
+\[
+s_{\mathrm{DKPS}}(\mathbf{x}_i,\mathbf{x}_j\mid\boldsymbol{\lambda})
+=
+\prod_{k=1}^{p_c}\frac{1}{\lambda_k}
+K_k\left(\frac{x_{i,k}-x_{j,k}}{\lambda_k}\right)
++
+\sum_{k=p_c+1}^{p_c+p_u}
+L_k(x_{i,k},x_{j,k};\lambda_k)
++
+\sum_{k=p_c+p_u+1}^{p}
+\ell_k(x_{i,k},x_{j,k};\lambda_k),
+\]
 
-\begin{equation}\label{eq:dksssim}
-s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda}) = \sum_{k=1}^{p_c}  K\left( \frac{x_{i,k} - x_{j,k}}{\lambda_k}\right)  + \sum_{k=p_c+1}^{p_c + p_u} L(x_{i,k},x_{j,k},\lambda_k) + \sum_{k = p_c+p_u+1}^p l(x_{i,k},x_{j,k},\lambda_k).
-\end{equation}
+and the kernel summation similarity
 
-For both $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, $K(\cdot)$, $L(\cdot)$, and $\ell(\cdot)$ are kernel functions for continuous (numeric), nominal (factor), and ordinal (ordered factor) variables, respectively. The data frame consists of $p$-many variables, such that $p = p_c + p_u + p_o$ is the sum of the continuous, nominal, and ordinal variables, respectively. $\boldsymbol{\lambda}$ is a vector of length $p$ containing variable-specific bandwidth values for each kernel function. 
+\[
+s_{\mathrm{DKSS}}(\mathbf{x}_i,\mathbf{x}_j\mid\boldsymbol{\lambda})
+=
+\sum_{k=1}^{p_c}
+K_k\left(\frac{x_{i,k}-x_{j,k}}{\lambda_k}\right)
++
+\sum_{k=p_c+1}^{p_c+p_u}
+L_k(x_{i,k},x_{j,k};\lambda_k)
++
+\sum_{k=p_c+p_u+1}^{p}
+\ell_k(x_{i,k},x_{j,k};\lambda_k).
+\]
 
-Phillips and Venkatasubramanian (2011) discuss how to calculate distance from similarity functions. Using either similarity function from  $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ or $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, the kernel distance between two observations $\mathbf{x}_i$ and $\mathbf{x}_j$ is given by 
+Either similarity is converted to a squared kernel distance through
 
-\begin{equation}\label{eq:kerndist}
-  d^2(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) = s(\mathbf{x}_i, \mathbf{x}_i \ | \ \boldsymbol{\lambda}) + s(\mathbf{x}_j, \mathbf{x}_j \ | \ \boldsymbol{\lambda}) - 2s(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda}).
-\end{equation}
+\[
+d^2(\mathbf{x}_i,\mathbf{x}_j\mid\boldsymbol{\lambda})
+=
+s(\mathbf{x}_i,\mathbf{x}_i\mid\boldsymbol{\lambda})
++
+s(\mathbf{x}_j,\mathbf{x}_j\mid\boldsymbol{\lambda})
+-
+2s(\mathbf{x}_i,\mathbf{x}_j\mid\boldsymbol{\lambda}).
+\]
 
-These two distances can be called in \(\texttt{R}\) with the package \(\texttt{kdml}\) using functions \(\texttt{dkps}\) for Equation $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and \(\texttt{dkss}\) for Equation $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$, both of which are used in the Equation $d^2(\mathbf{x}_i, \mathbf{x}_j \ | \ \boldsymbol{\lambda})$ for pairwise distance calculations.
+When using the product similarity, we refer to the metric as the distance using kernel product similarity (DKPS), and when using the summation similarity, we refer to the metric as the distance using kernel summation similarity (DKSS). 
 
-The vector of bandwidths $\boldsymbol{\lambda}$ may be a user-input numeric vector of length $p$, for which the possible values for bandwidths for each variable type are bounded based on the kernel choice. For continuous variables $\lambda > 0$, ordinal variables $\lambda \in [0,1]$, and nominal variables is kernel specific. For example, $\lambda \in [0,1]$ for the 'u_aitken' kernel and $\lambda \in [0,(c-1)/c]$ for 'u_aitchisonaitken', where $c$ is the number of unique values for a specific nominal variable. For an overview of kernel functions, we refer the reader to Aitchison and Aitken (1976), Cameron and Trivedi (2005), Härdle et al. (2004), Li and Racine (2007), Li and Racine (2003), Silverman (1986), Titterington and Bowman (1985), and Wang and van Ryzin (1981).
+The usual KDML estimator chooses the bandwidths by maximum similarity
+cross-validation (MSCV). MSCV measures the
+leave-one-out similarity of every observation to the remaining observations:
 
-# Installing
+\[
+S(\boldsymbol{\lambda};\mathbf{X})
+=
+\frac{1}{n}\sum_{i=1}^{n}
+\log\left[
+\frac{1}{n-1}
+\sum_{\substack{j=1\\j\ne i}}^{n}
+s(\mathbf{x}_i,\mathbf{x}_j\mid,\boldsymbol{\lambda})
+\right].
+\]
 
-You can install the stable version from CRAN using \(\texttt{install.packages()}\). The developmental version of \textsf{kdml} from [Github](https://github.com/jrjthompson/R-package-kdml) with:
-```{r, echo = TRUE, eval = FALSE}
-library(devtools)
-install_github("jrjthompson/R-package-kdml")
+Maximizing the MSCV criterion estimates all feature bandwidths simultaneously, producing point estimates for the bandwidth parameters. If we are interested in quantifying uncertainty in both the kernels used and their bandwidths we may treat the negative MSCV criterion, \(-S\), as a loss function within an MCMC algorithm (Bissiri et al., 2016; Krasnov and Thompson, 2026). Let \(\boldsymbol{\theta}\) denote bandwidth parameters that have undergone a suitable transformation so they are unconstrained and \(m\) the collection of feature-specific kernels. The resulting posterior target is
+
+\[
+\pi(m,\boldsymbol{\theta}\mid\mathbf{X})
+\propto
+\exp\left\{\beta
+S\bigl(m,g(\boldsymbol{\theta});\mathbf{X}\bigr)\right\}
+p(\boldsymbol{\theta}\mid m)p(m),
+\]
+
+where \(g\) maps transformed parameters into the bandwidth domain for each kernel and \(\beta>0\) controls the relative influence of the MSCV criterion and the prior. The MCMC sampler updates each feature sequentially by jointly proposing a kernel and a random-walk update to its transformed bandwidth. The retained samples provide posterior distributions for the bandwidths, posterior probabilities for the kernel choices, and a sampled maximum a posteriori (MAP) estimate.
+
+# Installation
+
+The standard installation provides a CPU backend:
+
+```{r install-cpu, eval=FALSE}
+install.packages("kdml")
 library(kdml)
 ```
 
-# Bandwidth Selection 
+When using the MCMC sampler we recommend using a CUDA device to  accelerate the repeated MSCV evaluations. To enable CUDA, you must have an NVIDIA GPU, the NVIDIA CUDA Toolkit, and `nvcc` installed. Then install the package using the following command:
 
-The maximum similarity cross-validation (MSCV) method for bandwidth selection (Ghashti and Thompson, 2024) is based on the objective
-  
- \begin{equation}\label{eq:mscv}
-  \underset{\boldsymbol{\lambda}}{\text{argmax}}\left\{\frac{1}{n}\sum_{i=1}^n\log\left(\frac{1}{(n-1)}\sum_{\substack{j=1 \\ j \ne i}}^n s_{\boldsymbol{\lambda}}(\textbf{x}_i,\textbf{x}_j)\right)\right\},
-\end{equation}
- 
-  where $s_{\boldsymbol{\lambda}}(\cdot)$ is as the similarity function for  $s_{\text{dkps}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$ and $s_{\text{kss}}(\mathbf{x}_{i}, \mathbf{x}_{j} \vert \boldsymbol{\lambda})$. (MSCV) can be invoked implicitly within the distance calculation by setting the argument \(\texttt{bw = "mscv"}\) in the functions \(\texttt{dkps}\) and \(\texttt{dkss}\). Users also have the option of setting the argument \(\texttt{bw = "np"}\) to specify bandwidth selection using maximum-likelihood cross-validation from the highly optimized package \(\texttt{np}\) (Hayfield and Racine, 2008).
-
-# Data Generation
-
-To simulate data containing a mix of variable types and true class labels, we have included the function \(\texttt{confactord}\). This function performs the following simulation automatically, and can be configured for any number of numeric, nominal and ordinal variables. See the package manual for more details. 
-
-We simulate a mix of continuous ($x_1$, $x_4$), nominal ($x_2$, $x_3$), and ordinal data ($x_5$, $x_6$) an store in a data frame as follows
-```{r}
-df <- data.frame(
-  x1 = runif(100, 0, 100),
-  x2 = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
-  x3 = factor(sample(c("A", "B", "C"), 100, replace = TRUE)),
-  x4 = rnorm(100, 10, 3),
-  x5 = ordered(sample(c("Low", "Medium", "High"), 100, replace = TRUE), 
-               levels = c("Low", "Medium", "High")),
-  x6 = ordered(sample(c("Low", "Medium", "High"), 100, replace = TRUE), 
-               levels = c("Low", "Medium", "High"))
+```{r install-cuda, eval=FALSE}
+Sys.setenv(KDML_ENABLE_CUDA = "true")
+install.packages(
+  "kdml",
+  type = "source",
+  INSTALL_opts = "--preclean"
 )
 ```
 
-A minimial usage of the distance metrics functions requires only the data frame, where the functions default the kernel functions, and the bandwidth specification method to 'mscv'.
+To check if CUDA is available, run the following commands:
 
-```{r, echo = TRUE, eval = FALSE}
-# DKPS distance 
-dis_dkps <- dkps(df = df)
+```{r verify-cuda, eval=TRUE}
+library(kdml)
 
-# DKSS distance 
-dis_kdss <- kdss(df = df)
+cuda_available()
 ```
 
-Using the maximum-likelihood cross-validation technique from package \(\texttt{np}\).
+# Example Analysis
 
-```{r, echo = TRUE, eval = FALSE}
-# DKPS distance 
-dis_dkps_np <- dkps(df = df, bw = "np")
+`kdml` provides the `confactord()` function to generate mixed-type data. In this vignette, we generate 200 observations from two equally probable
+clusters.
 
-# DKSS distance 
-dis_kdss_np <- kdss(df = df, bw = "np")
+```{r simulate-data, fig.width=9, fig.height=9, out.width="100%", fig.align="center"}
+set.seed(100)
+
+simulated <- confactord(
+  n = 200,
+  popProb = c(0.5, 0.5),
+  numMixVar = c(2, 2, 2),
+  numMixVarOl = c(1, 1, 1),
+  olVarType = c(0.15, 0.15, 0.15),
+  catLevels = c(3, 4)
+)
+
+df <- simulated$data
+names(df) <- c(
+  "continuous_1", "continuous_2",
+  "nominal_1", "nominal_2",
+  "ordinal_1", "ordinal_2"
+)
+
+true_cluster <- factor(
+  simulated$class,
+  levels = c(1, 2),
+  labels = c("Cluster 1", "Cluster 2")
+)
+cluster_colours <- c("#0072B2", "#D55E00")
+
+pairs(
+  data.matrix(df),
+  pch = 19,
+  cex = 0.5,
+  col = grDevices::adjustcolor(
+    cluster_colours[as.integer(true_cluster)],
+    alpha.f = 0.6
+  ),
+  labels = gsub("_", " ", names(df)),
+  main = "Simulated mixed-type data\nCluster 1 (blue), Cluster 2 (orange)"
+)
 ```
 
-Users also have many kernel functions available them, which are listed in the additional arguments below. Some of the kernel functions from \(\texttt{np}\) are not available. Kernels used for the bandwidth selection technique should be the same used for the distance calculation.
+Use `mscv.dkps()` to estimate the bandwidths, then pass them to `dkps()` to
+obtain the pairwise distances:
 
-```{r, echo = TRUE, eval = FALSE}
-dis_dkps_custom_kernels <- dkss(df = df, bw = "mscv", 
-    cFUN = "c_epanechnikov", uFUN = "u_aitken", oFUN = "o_habbema")
+```{r fit-mscv}
+set.seed(100)
+
+mscv_fit <- mscv.dkps(
+  df = df,
+  verbose = TRUE
+)
+
+dkps_mscv <- dkps(
+  df = df,
+  bw = mscv_fit$bw[, 1]
+)
+
+dkps_mscv$distances[1:5, 1:5]
 ```
 
-If users require only the bandwidths selected by MSCV, and not the pairwise distance matrix obtained from \(\texttt{dkps}\) or \(\texttt{dkss}\), they may do so with the following function calls:
+Alternatively, estimate the kernels and bandwidths by MCMC, then pass the fit
+to `dkps()` to obtain the pairwise distances:
 
-```{r, echo = TRUE, eval = FALSE}
-# MSCV bandwidth specification using the similarity function in Equation (1)
-mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", 
-           ukernel = "u_aitken", okernel = "o_wangvanryzin", verbose = TRUE) 
+```{r fit-mcmc}
+set.seed(100)
 
-# MSCV bandwidth specification using the similarity function in Equation (2)
-mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", 
-          ukernel = "u_aitken", okernel = "o_wangvanryzin", verbose = TRUE) 
+fit_dkps_mcmc <- mcmc.dkps(
+  df = df,
+  chains = 4,
+  chain_threads = 1,
+  warmup = 5000,
+  draws = 5000,
+  thin = 5,
+  backend = "cuda",
+  progress = FALSE
+)
+
+dis_dkps_mcmc <- dkps(fit_dkps_mcmc)
+dis_dkps_mcmc$distances[1:5, 1:5]
 ```
 
-For more details on the usage of each of these functions, consult the package documentation found on CRAN.
+# Diagnostics
+
+Before interpreting the MCMC results, it is important to assess convergence and sampling efficiency. The package provides trace, autocorrelation, and proposal-acceptance plots, along with rank-normalized \(\widehat{R}\) and bulk and tail effective sample sizes (ESS). Calling summary() on the fitted MCMC object provides a convenient overview of these diagnostics.
+
+```{r diagnostic-summaries}
+fit_summary <- summary(fit_dkps_mcmc)
+
+fit_summary$theta
+fit_summary$convergence
+fit_summary$score
+```
+
+Trace plots can be accessed through the `plot()` with `type="trace"`. Here we expect to see that each MCMC chain has converged to the same stationary distribution.
+
+```{r trace-plots, fig.width=8, fig.height=7}
+diagnostic_features <- c(
+  "continuous_1",
+  "nominal_1",
+  "ordinal_1"
+)
+
+plot(
+  fit_dkps_mcmc,
+  type = "trace",
+  features = diagnostic_features
+)
+```
+
+Next, autocorrelation plots can be obtained with `type="acf"`. An MCMC chain that has converged should have low autocorrelation.
+
+
+```{r acf-plots, fig.width=8, fig.height=7}
+plot(
+  fit_dkps_mcmc,
+  type = "acf",
+  features = diagnostic_features
+)
+```
+
+To view both \(\widehat{R}\) and the effective sample size (ESS) together, use `type = "diagnostics"`. The \(\widehat{R}\) statistic compares within-chain and between-chain variation to assess whether the MCMC chains have mixed and converged. Values close to 1 indicate good convergence, whereas values greater than 1 suggest the chains have not yet converged. The ESS measures the amount of independent information contained in the correlated MCMC draws, and can be interpreted as the equivalent number of independent samples represented by the chain.
+
+```{r diagnostic-plots, fig.width=9, fig.height=5}
+plot(fit_dkps_mcmc, type = "diagnostics")
+```
+
+We may also be interested in the trace plot of the score function which can be accessed via `type="score"`. Similar to other trace plots, we wish to see that each chain has converged to the same values.
+
+```{r score-plots, fig.width=8, fig.height=6}
+plot(fit_dkps_mcmc, type = "score")
+```
+
+Bandwidth density plots allow us to inspect the uncertainty in our estimates. These plots can be viewed with `type = "bandwidth"`. Continuous bandwidth densities are displayed on the natural-log
+scale and nominal and ordinal bandwidths are plotted as is.
+
+```{r bandwidth-posteriors, fig.width=8, fig.height=6}
+plot(fit_dkps_mcmc, type = "bandwidth")
+```
+
+The MCMC algorithm provides posterior probabilities for each kernel choice. We can visualize these probabilities with `type = "kernel"`. First we look at the continuous kernels:
+
+```{r kernel-posteriors-continuous, fig.width=10, fig.height=4.5}
+plot(
+  fit_dkps_mcmc,
+  type = "kernel",
+  features = c("continuous_1", "continuous_2"),
+  args.legend = list(
+    x = "topright",
+    inset = c(-0.55, 0),
+    bty = "n",
+    cex = 0.7
+  )
+)
+```
+
+Next the nominal kernels:
+
+```{r kernel-posteriors-nominal, fig.width=10, fig.height=4.5}
+plot(
+  fit_dkps_mcmc,
+  type = "kernel",
+  features = c("nominal_1", "nominal_2"),
+  args.legend = list(
+    x = "topright",
+    inset = c(-0.55, 0),
+    bty = "n",
+    cex = 0.7
+  )
+)
+```
+
+Finally the ordinal kernels:
+
+```{r kernel-posteriors-ordinal, fig.width=10, fig.height=4.5}
+plot(
+  fit_dkps_mcmc,
+  type = "kernel",
+  features = c("ordinal_1", "ordinal_2"),
+  args.legend = list(
+    x = "topright",
+    inset = c(-0.55, 0),
+    bty = "n",
+    cex = 0.7
+  )
+)
+```
+
+Post-warmup acceptance rates are reported separately for kernel and
+bandwidth proposals with `type = "acceptance"`. Very low rates can indicate proposals that are too
+aggressive, while rates near one can indicate moves that are too small to
+explore the posterior efficiently.
+
+```{r acceptance-plot, fig.width=9, fig.height=5}
+plot(fit_dkps_mcmc, type = "acceptance")
+```
+
+
+## Performing Clustering
+
+We finish by comparing hierarchical clustering based on the standard MSCV
+estimate and the MCMC MAP estimate.
+
+```{r clustering}
+hc_mscv <- hclust(
+  as.dist(sqrt(pmax(dkps_mscv$distances, 0))),
+  method = "ward.D2"
+)
+hc_mcmc <- hclust(
+  as.dist(sqrt(pmax(dis_dkps_mcmc$distances, 0))),
+  method = "ward.D2"
+)
+
+clusters_mscv <- cutree(hc_mscv, k = 2)
+clusters_mcmc <- cutree(hc_mcmc, k = 2)
+```
+
+```{r clustering-plots, fig.width=9, fig.height=5}
+plot(
+  hc_mscv,
+  labels = FALSE,
+  hang = -1,
+  main = "Ward Clustering using MSCV",
+  xlab = ""
+)
+rect.hclust(hc_mscv, k = 2, border = cluster_colours)
+plot(
+  hc_mcmc,
+  labels = FALSE,
+  hang = -1,
+  main = "Ward Clustering using MCMC",
+  xlab = ""
+)
+rect.hclust(hc_mcmc, k = 2, border = cluster_colours)
+```
+
+We can see that each clustering method has correctly identified the two clusters. The following tables show the number of observations in each true cluster that were assigned to each estimated cluster.
+
+```{r clustering-tables}
+table(
+  true_cluster = true_cluster,
+  MSCV_cluster = clusters_mscv
+)
+
+table(
+  true_cluster = true_cluster,
+  MCMC_cluster = clusters_mcmc
+)
+```
 
 **References**
 
-[1] Aitchison, J. and C.G.G. Aitken (1976), “Multivariate binary discrimination by the kernel method”, Biometrika, 63, 413-420.
+[1] Bissiri, P.G., C.C. Holmes, and S.G. Walker (2016), "A General Framework
+for Updating Belief Distributions", *Journal of the Royal Statistical Society:
+Series B*, 78(5), 1103-1130.
 
-[2] Cameron, A. and P. Trivedi (2005), “Microeconometrics: Methods and Applications”, Cambridge University Press.
+[2] Ghashti, J.S. (2024), "Similarity Maximization and Shrinkage Approach in
+Kernel Metric Learning for Clustering Mixed-Type Data", PhD thesis, University
+of British Columbia.
 
-[3] Ghashti, J.S. (2024), "Similarity Maximization and Shrinkage Approach in Kernel Metric Learning for Clustering Mixed-type Data", University of British Columbia.
+[3] Ghashti, J.S. and J.R.J. Thompson (2025), "Mixed-Type Distance Shrinkage
+and Selection for Clustering via Kernel Metric Learning", *Journal of
+Classification*, 42, 311-334.
+<https://doi.org/10.1007/s00357-024-09493-z>.
 
-[4] Ghashti, J.S. and J.R.J Thompson (2024), “Mixed-type Distance Shrinkage and Selection for Clustering via Kernel Metric Learning”, Journal of Classification, Accepted.
+[4] Hayfield, T. and J.S. Racine (2008), "Nonparametric Econometrics: The
+`np` Package", *Journal of Statistical Software*, 27(5).
 
-[5] Härdle, W., and M. Müller and S. Sperlich and A. Werwatz (2004), Nonparametric and Semiparametric Models, (Vol. 1). Berlin: Springer.
+[5] Krasnov, D. and J.R.J. Thompson (2026), "Bayesian Inference for Kernel
+Metric Learning", unpublished manuscript.
 
-[6] Hayfield, T. and J.S. Racine (2008). Nonparametric Econometrics: The \(\texttt{np}\) Package. Journal of Statistical Software 27(5).
+[6] Li, Q. and J.S. Racine (2007), *Nonparametric Econometrics: Theory and
+Practice*, Princeton University Press.
 
-[7] Li, Q. and J.S. Racine (2007), Nonparametric Econometrics: Theory and Practice, Princeton University Press.
+[7] Silverman, B.W. (1986), *Density Estimation for Statistics and Data
+Analysis*, Chapman and Hall.
 
-[8] Li, Q. and J.S. Racine (2003), “Nonparametric estimation of distributions with categorical and continuous data”, Journal of Multivariate Analysis, 86, 266-292.
-
-[9] Silverman, B.W. (1986), Density Estimation, London: Chapman and Hall.
-
-[10] Titterington, D.M. and A.W. Bowman (1985), “A comparative study of smoothing procedures for ordered categorical data”, Journal of Statistical Computation and Simulation, 21(3-4), 291-312.
-
-[11] Wang, M.C. and J. van Ryzin (1981), “A class of smooth estimators for discrete distributions”, Biometrika, 68, 301-309.
+[8] Wang, M.C. and J. van Ryzin (1981), "A Class of Smooth Estimators for
+Discrete Distributions", *Biometrika*, 68, 301-309.

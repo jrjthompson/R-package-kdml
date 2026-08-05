@@ -1,0 +1,177 @@
+#!/bin/sh
+
+set -eu
+
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+platform=${KDML_CONFIG_PLATFORM:-unix}
+enable_cuda=${KDML_ENABLE_CUDA:-no}
+nvcc_request=${KDML_NVCC:-}
+host_compiler=${KDML_CUDA_HOST_COMPILER:-${NVCC_CCBIN:-}}
+cuda_flags=${KDML_CUDA_FLAGS:-}
+
+for argument in "$@"; do
+    case "$argument" in
+        --enable-cuda|--with-cuda)
+            enable_cuda=yes
+            ;;
+        --disable-cuda|--without-cuda)
+            enable_cuda=no
+            ;;
+        --with-nvcc=*)
+            nvcc_request=${argument#*=}
+            ;;
+        --with-cuda-host-compiler=*|--with-ccbin=*)
+            host_compiler=${argument#*=}
+            ;;
+        --help)
+            echo "kdml configure options:"
+            echo "  --enable-cuda        build the optional CUDA sidecar"
+            echo "  --disable-cuda       build the portable CPU package (default)"
+            echo "  --with-nvcc=PATH     CUDA compiler used by --enable-cuda"
+            echo "  --with-ccbin=PATH    host compiler passed safely to nvcc"
+            echo "Environment: KDML_ENABLE_CUDA, KDML_NVCC, KDML_CUDA_FLAGS,"
+            echo "             KDML_CUDA_HOST_COMPILER (or NVCC_CCBIN)"
+            exit 0
+            ;;
+        *)
+            echo "configure: ignoring unrecognized option: $argument" >&2
+            ;;
+    esac
+done
+
+case "$enable_cuda" in
+    1|yes|YES|true|TRUE|on|ON)
+        enable_cuda=yes
+        ;;
+    0|no|NO|false|FALSE|off|OFF|"")
+        enable_cuda=no
+        ;;
+    *)
+        echo "configure: KDML_ENABLE_CUDA must be yes/no or 1/0" >&2
+        exit 1
+        ;;
+esac
+
+if test "$platform" = windows; then
+    makevars_output="$script_dir/src/Makevars.win"
+    cuda_template="$script_dir/src/Makevars.win.in"
+else
+    makevars_output="$script_dir/src/Makevars"
+    cuda_template="$script_dir/src/Makevars.in"
+fi
+
+# Configuration changes the implementation compiled into this object. Remove
+# every config-dependent output so an install without --preclean cannot reuse
+# an object or shared library from the other mode.
+cuda_marker="$script_dir/src/kdml_cuda_enabled"
+rm -f "$script_dir/src/kdml_cuda_loader.o"
+rm -f "$script_dir/src/kdml_cuda_loader.obj"
+rm -f "$script_dir/src/kdml.dll" "$script_dir/src/kdml.so"
+rm -f "$script_dir/src/kdml.dylib"
+rm -f "$script_dir/src/kdmlcuda.dll" "$script_dir/src/kdmlcuda.so"
+rm -f "$script_dir/src/kdmlcuda.dylib"
+rm -f "$script_dir/src/kdmlcuda.exe"
+rm -f "$script_dir/src/kdmlcuda.lib" "$script_dir/src/kdmlcuda.exp"
+rm -f "$cuda_marker"
+
+if test "$enable_cuda" = no; then
+    cp "$script_dir/src/Makevars.cpu.in" "$makevars_output"
+    echo "configure: CUDA disabled; the portable CPU backend will be built"
+    exit 0
+fi
+
+if test -n "$nvcc_request"; then
+    if test -x "$nvcc_request"; then
+        nvcc=$nvcc_request
+    elif command -v "$nvcc_request" >/dev/null 2>&1; then
+        nvcc=$(command -v "$nvcc_request")
+    else
+        echo "configure: requested nvcc was not found: $nvcc_request" >&2
+        exit 1
+    fi
+elif command -v nvcc >/dev/null 2>&1; then
+    nvcc=$(command -v nvcc)
+else
+    echo "configure: --enable-cuda requires nvcc on PATH or KDML_NVCC" >&2
+    exit 1
+fi
+
+if command -v cygpath >/dev/null 2>&1; then
+    nvcc=$(cygpath -m "$nvcc")
+fi
+
+if test -n "$host_compiler"; then
+    if test -e "$host_compiler"; then
+        :
+    elif command -v "$host_compiler" >/dev/null 2>&1; then
+        host_compiler=$(command -v "$host_compiler")
+    else
+        echo "configure: requested CUDA host compiler was not found: $host_compiler" >&2
+        exit 1
+    fi
+    if command -v cygpath >/dev/null 2>&1; then
+        host_compiler=$(cygpath -m "$host_compiler")
+    fi
+fi
+
+if ! "$nvcc" --version >/dev/null 2>&1; then
+    echo "configure: nvcc could not be executed: $nvcc" >&2
+    exit 1
+fi
+
+temporary_base=${TMPDIR:-/tmp}
+if command -v cygpath >/dev/null 2>&1; then
+    temporary_base=$(cygpath -u "$temporary_base")
+fi
+probe_dir=$(mktemp -d "$temporary_base/kdml-cuda-probe.XXXXXX")
+trap 'rm -rf "$probe_dir"' EXIT HUP INT TERM
+
+cat > "$probe_dir/conftest.cu" <<'KDML_EOF'
+#include <cuda_runtime_api.h>
+__global__ void kdml_cuda_configure_probe_kernel(void) {}
+extern "C" int kdml_cuda_configure_probe(void) { return 0; }
+KDML_EOF
+
+probe_object="$probe_dir/conftest.o"
+if test "$platform" = windows; then
+    probe_object="$probe_dir/conftest.obj"
+fi
+
+echo "configure: checking whether nvcc can compile CUDA C++14 code"
+if test -n "$host_compiler"; then
+    set -- -ccbin "$host_compiler"
+else
+    set --
+fi
+if ! "$nvcc" --std=c++14 "$@" $cuda_flags \
+        -c "$probe_dir/conftest.cu" -o "$probe_object" \
+        >"$probe_dir/nvcc.log" 2>&1; then
+    cat "$probe_dir/nvcc.log" >&2
+    echo "configure: CUDA compiler probe failed" >&2
+    echo "configure: use a host compiler supported by this CUDA Toolkit;" >&2
+    echo "configure: kdml does not bypass nvcc's compiler compatibility check" >&2
+    exit 1
+fi
+
+escape_template_value()
+{
+    printf '%s' "$1" |
+        sed -e 's/[$]/$$/g' -e 's/#/\\#/g' -e 's/[\\&|]/\\&/g'
+}
+
+if test -n "$host_compiler"; then
+    ccbin_option="-ccbin \"$host_compiler\""
+else
+    ccbin_option=
+fi
+
+escaped_nvcc=$(escape_template_value "$nvcc")
+escaped_ccbin=$(escape_template_value "$ccbin_option")
+escaped_flags=$(escape_template_value "$cuda_flags")
+sed -e "s|@KDML_NVCC@|$escaped_nvcc|g" \
+    -e "s|@KDML_CUDA_CCBIN@|$escaped_ccbin|g" \
+    -e "s|@KDML_CUDA_FLAGS@|$escaped_flags|g" \
+    "$cuda_template" > "$makevars_output"
+printf '%s\n' enabled > "$cuda_marker"
+
+echo "configure: CUDA sidecar enabled with $nvcc"

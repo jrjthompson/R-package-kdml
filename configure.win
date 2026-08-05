@@ -1,0 +1,5 @@
+#!/bin/sh
+
+set -eu
+script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+KDML_CONFIG_PLATFORM=windows exec "$script_dir/configure" "$@"

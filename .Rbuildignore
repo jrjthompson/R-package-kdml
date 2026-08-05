@@ -3,3 +3,8 @@
 ^\.github$
 ^LICENSE\.md$
 ^cran-comments\.md$
+^archive(/|$)
+^build(/|$)
+^src/Makevars$
+^src/Makevars\.win$
+^src/kdml_cuda_enabled$

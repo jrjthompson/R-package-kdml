@@ -1,0 +1,10 @@
+wine.data
+---------
+
+Source: UCI Machine Learning Repository, Wine dataset
+https://archive.ics.uci.edu/dataset/109/wine
+
+Citation: Aeberhard, S. and Forina, M. (1992). Wine [Dataset].
+UCI Machine Learning Repository. https://doi.org/10.24432/C5PC7J
+
+License: Creative Commons Attribution 4.0 International (CC BY 4.0).

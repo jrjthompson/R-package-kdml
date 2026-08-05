@@ -2,3 +2,14 @@
 .Rhistory
 .RData
 .Ruserdata
+src/*.o
+src/*.obj
+src/*.dll
+src/*.so
+src/*.dylib
+src/*.lib
+src/*.exp
+src/*.exe
+src/Makevars
+src/Makevars.win
+src/kdml_cuda_enabled

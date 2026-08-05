@@ -1,0 +1,34 @@
+PKG_CPPFLAGS = -DKDML_CUDA_SIDECAR=1
+PKG_CFLAGS = $(SHLIB_OPENMP_CFLAGS)
+PKG_LIBS = $(SHLIB_OPENMP_CFLAGS)
+
+KDML_NVCC = @KDML_NVCC@
+KDML_CUDA_CCBIN = @KDML_CUDA_CCBIN@
+KDML_CUDA_FLAGS = @KDML_CUDA_FLAGS@
+KDML_CUDA_REMAP = \
+  -DKDML_CUDA_EXPORTS=1 \
+  -Dkdml_cuda_compiled=kdmlcuda_compiled \
+  -Dkdml_cuda_available=kdmlcuda_available \
+  -Dkdml_cuda_compile_version=kdmlcuda_compile_version \
+  -Dkdml_cuda_compile_version_string=kdmlcuda_compile_version_string \
+  -Dkdml_cuda_runtime_version=kdmlcuda_runtime_version \
+  -Dkdml_cuda_device_count=kdmlcuda_device_count \
+  -Dkdml_cuda_device_info=kdmlcuda_device_info \
+  -Dkdml_cuda_last_error=kdmlcuda_last_error \
+  -Dkdml_cuda_status_string=kdmlcuda_status_string \
+  -Dkdml_cuda_create=kdmlcuda_create \
+  -Dkdml_cuda_build=kdmlcuda_build \
+  -Dkdml_cuda_propose=kdmlcuda_propose \
+  -Dkdml_cuda_accept=kdmlcuda_accept \
+  -Dkdml_cuda_destroy=kdmlcuda_destroy
+
+all: $(SHLIB)
+
+$(SHLIB): kdmlcuda.dll
+
+kdmlcuda.dll: kdml_cuda.cu kdml_cuda_api.h
+	"$(KDML_NVCC)" --shared --std=c++14 $(KDML_CUDA_CCBIN) \
+	  $(KDML_CUDA_FLAGS) $(KDML_CUDA_REMAP) -o "$@" kdml_cuda.cu
+
+clean:
+	@rm -f kdmlcuda.dll kdmlcuda.exe kdmlcuda.lib kdmlcuda.exp

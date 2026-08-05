@@ -1,4 +1,50 @@
-dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken", oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE) {
+dkss <- function(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
+                 oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE,
+                 kernels = NULL, state = c("map", "last"), chain = 1L,
+                 draw = NULL, newdata = NULL) {
+  if (inherits(df, "kdml_mcmc")) {
+    if (!identical(df$distance, "dkss")) {
+      stop("`dkss()` requires a fit produced by `mcmc.dkss()`.",
+           call. = FALSE)
+    }
+    if (!missing(bw) || !missing(cFUN) || !missing(uFUN) || !missing(oFUN) ||
+        !is.null(kernels)) {
+      stop("Do not supply `bw`, `cFUN`, `uFUN`, `oFUN`, or `kernels` ",
+           "when `df` is an MCMC fit.", call. = FALSE)
+    }
+    if (isTRUE(verbose)) {
+      message("Computing DKSS distances from the fitted MCMC state.")
+    }
+    return(kdml.distance(
+      df, data = newdata, state = state, chain = chain, draw = draw,
+      standardize = stan
+    ))
+  }
+  if (!is.null(newdata) || !missing(state) || !missing(chain) || !missing(draw)) {
+    stop("`state`, `chain`, `draw`, and `newdata` are only available when ",
+         "`df` is an MCMC fit.", call. = FALSE)
+  }
+  feature_kernel_call <- !is.null(kernels) ||
+    length(cFUN) != 1L || length(uFUN) != 1L || length(oFUN) != 1L ||
+    !is.null(names(cFUN)) || !is.null(names(uFUN)) || !is.null(names(oFUN))
+  if (feature_kernel_call) {
+    if (!is.numeric(bw)) {
+      stop("Feature-specific kernels require a numeric `bw` vector. Use ",
+           "`mcmc.dkss()` to estimate feature-specific kernels and bandwidths.",
+           call. = FALSE)
+    }
+    if (!is.null(kernels) &&
+        (!missing(cFUN) || !missing(uFUN) || !missing(oFUN))) {
+      stop("Supply either `kernels` or the type-specific kernel arguments, ",
+           "not both.", call. = FALSE)
+    }
+    selected_kernels <- .kdml_feature_kernels(
+      df, kernels, cFUN, uFUN, oFUN
+    )
+    return(.kdml_fixed_distance(
+      df, "dkss", bw, selected_kernels, standardize = stan
+    ))
+  }
   v_ck <- c("c_gaussian", "c_epanechnikov", "c_uniform", "c_triangle",
             "c_biweight", "c_triweight", "c_tricube", "c_cosine", 
             "c_logistic", "c_sigmoid", "c_silverman")

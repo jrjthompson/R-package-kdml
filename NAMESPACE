@@ -1,5 +1,15 @@
-export("dkps", "dkss", "mscv.dkps", "mscv.dkss", "confactord", "kss", "spectral.clust") 
+useDynLib(kdml, .registration = TRUE, .fixes = "C_")
+export("dkps", "dkss", "mscv.dkps", "mscv.dkss", "confactord", "kss", "spectral.clust",
+       "mcmc.kdml", "mcmc.dkps", "mcmc.dkss", "kdml.distance", "kdml.diagnostics",
+       "cuda_available", "cuda_info")
+S3method(print, kdml_mcmc)
+S3method(print, summary.kdml_mcmc)
+S3method(summary, kdml_mcmc)
+S3method(plot, kdml_mcmc)
+S3method(as_draws, kdml_mcmc)
+S3method(as_draws_array, kdml_mcmc)
 import(MASS, stats, markdown)
 importFrom("np", "npudensbw")
+importFrom("posterior", "as_draws")
+importFrom("posterior", "as_draws_array")
 importFrom("utils", "combn","capture.output")
-
