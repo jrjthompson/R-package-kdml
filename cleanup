@@ -1,9 +1,24 @@
 #!/bin/sh
 
-rm -f src/Makevars src/Makevars.win
-rm -f src/kdml_cuda_enabled
-rm -f src/kdml_cuda_loader.o src/kdml_cuda_loader.obj
-rm -f src/kdml.so src/kdml.dll src/kdml.dylib
-rm -f src/kdmlcuda.so src/kdmlcuda.dll src/kdmlcuda.dylib
-rm -f src/kdmlcuda.exe
-rm -f src/kdmlcuda.lib src/kdmlcuda.exp
+set -eu
+
+script_dir=$(CDPATH= cd -P "$(dirname "$0")" >/dev/null 2>&1 && pwd)
+
+rm -f "$script_dir/src/Makevars" "$script_dir/src/Makevars.win"
+rm -f "$script_dir/src/kdml_cuda_enabled"
+rm -f "$script_dir/src/init.o" "$script_dir/src/init.obj"
+rm -f "$script_dir/src/kdml_core.o" "$script_dir/src/kdml_core.obj"
+rm -f "$script_dir/src/kdml_cuda_loader.o" \
+    "$script_dir/src/kdml_cuda_loader.obj"
+rm -f "$script_dir/src/kdml_interface.o" \
+    "$script_dir/src/kdml_interface.obj"
+rm -f "$script_dir/src/kdml_progress.o" \
+    "$script_dir/src/kdml_progress.obj"
+rm -f "$script_dir/src/kdml_sampler.o" \
+    "$script_dir/src/kdml_sampler.obj"
+rm -f "$script_dir/src/kdml.so" "$script_dir/src/kdml.dll" \
+    "$script_dir/src/kdml.dylib"
+rm -f "$script_dir/src/kdmlcuda.so" "$script_dir/src/kdmlcuda.dll" \
+    "$script_dir/src/kdmlcuda.dylib"
+rm -f "$script_dir/src/kdmlcuda.exe"
+rm -f "$script_dir/src/kdmlcuda.lib" "$script_dir/src/kdmlcuda.exp"

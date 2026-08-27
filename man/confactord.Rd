@@ -12,7 +12,7 @@ variable type, the amount of variables per variable type that have cluster
 overlap, the amount of cluster overlap for each variable type, the number of 
 levels for the nominal and ordinal variables, and proportion of observations 
 per class membership. Within and across-type variables are generated 
-independently from one another. Currently, only two classes are may be generated.
+independently from one another. Currently, only two classes may be generated.
 }
 \usage{
 confactord(n = 200, 
@@ -35,15 +35,15 @@ confactord(n = 200,
    numeric vector of integers of length three specifying (in order) the total 
    number of continuous (numeric), nominal (factor), and ordinal (ordered) 
    variables to be generated. If a specific variable type is not required, 
-   set the appropriate vector indice to zero. Defaults to 
+   set the appropriate vector index to zero. Defaults to
    \code{numMixVar = c(1,1,1)}.
 }
  \item{numMixVarOl}{
     numeric vector of integers of length three specifying (in order) the total 
     number of continuous (numeric), nominal (factor), and ordinal (ordered) 
     variables that will have class membership overlap. If all variables are to
-    be well-separated by class membership, set all indices to zero. No indice 
-    of this vector may be greater than the corresponding indice in 
+    be well-separated by class membership, set all indices to zero. No index
+    of this vector may be greater than the corresponding index in
     \code{numMixVar}. Defaults to \code{numMixVarOl = c(1,1,1)}.
 }
  \item{olVarType}{
@@ -93,6 +93,7 @@ confactord(n = 200,
 }
 
 \examples{
+set.seed(9)
 # EXAMPLE1: Default implementation generates the following
 # 200 observations split into two clusters of equal size (100 observations each) 
 # Three variables-- one of each numeric, factor, and ordered
@@ -104,21 +105,20 @@ df1 <- confactord()
 
 
 # EXAMPLE2: 
-# 500 observations; 100 observations in cluster one and 400 in cluster two 
+# 50 observations; 10 observations in cluster one and 40 in cluster two
 # Three continuous variables, two nominal, one ordinal
 # Only one continuous variable has cluster overlap
 # All nominal and ordinal variables have cluster overlap
 # Cluster overlap for continuous variable is twenty percent
 # Cluster overlap for nominal variables are thirty percent
-# Cluster overlap for ordinal variable is fourty percent
+# Cluster overlap for ordinal variable is forty percent
 # Nominal variable has three levels, while ordinal has 5
 
-df2 <- confactord(n = 500, 
+df2 <- confactord(n = 50,
                     popProb = c(0.2,0.8), 
                     numMixVar = c(3,2,1), 
                     numMixVarOl = c(1,2,1),  
                     olVarType = c(0.2,0.3,0.4), 
                     catLevels = c(3,5))
 }
-
 

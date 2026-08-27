@@ -512,11 +512,6 @@ static void kdml_backend_destroy(kdml_score_backend *backend)
     }
 }
 
-SEXP kdml_cuda_available_call(void)
-{
-    return Rf_ScalarLogical(kdml_cuda_available() != 0);
-}
-
 SEXP kdml_cuda_info_call(void)
 {
     static const char *result_names[] = {

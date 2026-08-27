@@ -1,5 +1,5 @@
 #!/bin/sh
 
 set -eu
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+script_dir=$(CDPATH= cd -P "$(dirname "$0")" >/dev/null 2>&1 && pwd)
 KDML_CONFIG_PLATFORM=windows exec "$script_dir/configure" "$@"

@@ -1,19 +1,12 @@
-#include <R.h>
-#include <Rinternals.h>
+#include "kdml.h"
+
 #include <R_ext/Rdynload.h>
 #include <R_ext/Visibility.h>
-
-extern SEXP kdml_mcmc_call(SEXP);
-extern SEXP kdml_score_call(SEXP);
-extern SEXP kdml_distance_call(SEXP);
-extern SEXP kdml_cuda_available_call(void);
-extern SEXP kdml_cuda_info_call(void);
 
 static const R_CallMethodDef CallEntries[] = {
     {"kdml_mcmc_call", (DL_FUNC) &kdml_mcmc_call, 1},
     {"kdml_score_call", (DL_FUNC) &kdml_score_call, 1},
     {"kdml_distance_call", (DL_FUNC) &kdml_distance_call, 1},
-    {"kdml_cuda_available_call", (DL_FUNC) &kdml_cuda_available_call, 0},
     {"kdml_cuda_info_call", (DL_FUNC) &kdml_cuda_info_call, 0},
     {NULL, NULL, 0}
 };

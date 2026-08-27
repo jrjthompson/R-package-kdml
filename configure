@@ -2,7 +2,7 @@
 
 set -eu
 
-script_dir=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+script_dir=$(CDPATH= cd -P "$(dirname "$0")" >/dev/null 2>&1 && pwd)
 platform=${KDML_CONFIG_PLATFORM:-unix}
 enable_cuda=${KDML_ENABLE_CUDA:-no}
 nvcc_request=${KDML_NVCC:-}
@@ -101,7 +101,7 @@ if command -v cygpath >/dev/null 2>&1; then
 fi
 
 if test -n "$host_compiler"; then
-    if test -e "$host_compiler"; then
+    if test -f "$host_compiler" && test -x "$host_compiler"; then
         :
     elif command -v "$host_compiler" >/dev/null 2>&1; then
         host_compiler=$(command -v "$host_compiler")
@@ -123,33 +123,76 @@ temporary_base=${TMPDIR:-/tmp}
 if command -v cygpath >/dev/null 2>&1; then
     temporary_base=$(cygpath -u "$temporary_base")
 fi
-probe_dir=$(mktemp -d "$temporary_base/kdml-cuda-probe.XXXXXX")
-trap 'rm -rf "$probe_dir"' EXIT HUP INT TERM
+
+if test ! -d "$temporary_base" || test ! -w "$temporary_base"; then
+    echo "configure: temporary directory is not writable: $temporary_base" >&2
+    exit 1
+fi
+case "$temporary_base" in
+    /*)
+        ;;
+    *)
+        temporary_base=$(CDPATH= cd -P "$temporary_base" >/dev/null 2>&1 && pwd)
+        ;;
+esac
+
+# Do not depend on non-POSIX mktemp options.  The process ID plus a bounded
+# retry suffix gives mkdir an exclusive name, and umask protects probe files.
+probe_suffix=0
+while :; do
+    probe_dir="$temporary_base/kdml-cuda-probe.$$.$probe_suffix"
+    if (umask 077 && mkdir "$probe_dir") 2>/dev/null; then
+        break
+    fi
+    probe_suffix=$((probe_suffix + 1))
+    if test "$probe_suffix" -ge 100; then
+        echo "configure: could not create a CUDA probe directory in $temporary_base" >&2
+        exit 1
+    fi
+done
+
+cleanup_probe()
+{
+    if test -n "${probe_dir:-}" && test -d "$probe_dir"; then
+        rm -rf "$probe_dir"
+    fi
+}
+trap cleanup_probe 0
+trap 'exit 1' HUP INT QUIT TERM
 
 cat > "$probe_dir/conftest.cu" <<'KDML_EOF'
-#include <cuda_runtime_api.h>
+#include <cuda_runtime.h>
 __global__ void kdml_cuda_configure_probe_kernel(void) {}
-extern "C" int kdml_cuda_configure_probe(void) { return 0; }
+int main(void)
+{
+    kdml_cuda_configure_probe_kernel<<<1, 1>>>();
+    return cudaGetLastError() == cudaSuccess ? 0 : 1;
+}
 KDML_EOF
 
-probe_object="$probe_dir/conftest.o"
+probe_binary="$probe_dir/conftest"
 if test "$platform" = windows; then
-    probe_object="$probe_dir/conftest.obj"
+    probe_binary="$probe_dir/conftest.exe"
 fi
 
-echo "configure: checking whether nvcc can compile CUDA C++14 code"
+echo "configure: checking whether nvcc can compile and link CUDA C++14 code"
 if test -n "$host_compiler"; then
     set -- -ccbin "$host_compiler"
 else
     set --
 fi
 if ! "$nvcc" --std=c++14 "$@" $cuda_flags \
-        -c "$probe_dir/conftest.cu" -o "$probe_object" \
+        "$probe_dir/conftest.cu" -o "$probe_binary" \
         >"$probe_dir/nvcc.log" 2>&1; then
     cat "$probe_dir/nvcc.log" >&2
     echo "configure: CUDA compiler probe failed" >&2
     echo "configure: use a host compiler supported by this CUDA Toolkit;" >&2
     echo "configure: kdml does not bypass nvcc's compiler compatibility check" >&2
+    exit 1
+fi
+if test ! -s "$probe_binary"; then
+    cat "$probe_dir/nvcc.log" >&2
+    echo "configure: CUDA compiler probe did not produce a linked executable" >&2
     exit 1
 fi
 
@@ -168,10 +211,12 @@ fi
 escaped_nvcc=$(escape_template_value "$nvcc")
 escaped_ccbin=$(escape_template_value "$ccbin_option")
 escaped_flags=$(escape_template_value "$cuda_flags")
+generated_makevars="$probe_dir/Makevars"
 sed -e "s|@KDML_NVCC@|$escaped_nvcc|g" \
     -e "s|@KDML_CUDA_CCBIN@|$escaped_ccbin|g" \
     -e "s|@KDML_CUDA_FLAGS@|$escaped_flags|g" \
-    "$cuda_template" > "$makevars_output"
+    "$cuda_template" > "$generated_makevars"
+mv "$generated_makevars" "$makevars_output"
 printf '%s\n' enabled > "$cuda_marker"
 
 echo "configure: CUDA sidecar enabled with $nvcc"

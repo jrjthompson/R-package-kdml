@@ -13,3 +13,17 @@ src/*.exe
 src/Makevars
 src/Makevars.win
 src/kdml_cuda_enabled
+figure/
+kdml-local_files/
+vignettes/*_cache/
+vignettes/*_files/
+vignettes/*.html
+*.tar.gz
+*.Rcheck/
+
+/.quarto/
+**/*.quarto_ipynb
+
+# Local real-data MCMC benchmark (datasets, fitted chains, and reports)
+/local/real-data-benchmark/
+/local/mixed-type-paper-benchmark/

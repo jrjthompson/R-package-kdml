@@ -1,52 +1,26 @@
-.kdml_expand_type_kernels <- function(value, features, label) {
-  if (length(features) == 0L) {
-    return(setNames(character(), character()))
+.kdml_validate_flag <- function(value, label) {
+  if (!is.logical(value) || length(value) != 1L || is.na(value)) {
+    stop("`", label, "` must be TRUE or FALSE.", call. = FALSE)
   }
-  if (!is.character(value) || anyNA(value) || any(!nzchar(value))) {
-    stop("`", label, "` must be a character vector.", call. = FALSE)
-  }
-  if (length(value) == 1L && is.null(names(value))) {
-    return(setNames(rep(value, length(features)), features))
-  }
-  if (!is.null(names(value))) {
-    if (any(!nzchar(names(value))) || anyDuplicated(names(value)) ||
-        !setequal(names(value), features)) {
-      stop("Named `", label, "` must contain every ", label,
-           " feature exactly once.", call. = FALSE)
-    }
-    return(value[features])
-  }
-  if (length(value) != length(features)) {
-    stop("`", label, "` must be scalar or have one value per applicable feature.",
-         call. = FALSE)
-  }
-  setNames(value, features)
+  as.logical(value)
 }
 
-.kdml_feature_kernels <- function(df, kernels, cFUN, uFUN, oFUN) {
-  prep <- .kdml_prepare_data(df)
-  if (!is.null(kernels)) {
-    return(.kdml_validate_kernels(kernels, prep)$kernel)
+.kdml_validate_scalar_kernel <- function(value, choices, label) {
+  if (!is.character(value) || length(value) != 1L || is.na(value) ||
+      !value %in% choices) {
+    stop("Invalid ", label, " specified. Choose one of: ",
+         paste(choices, collapse = ", "), call. = FALSE)
   }
-
-  continuous <- prep$feature_names[prep$type == 0L]
-  nominal <- prep$feature_names[prep$type == 1L]
-  ordinal <- prep$feature_names[prep$type == 2L]
-  answer <- c(
-    .kdml_expand_type_kernels(cFUN, continuous, "cFUN"),
-    .kdml_expand_type_kernels(uFUN, nominal, "uFUN"),
-    .kdml_expand_type_kernels(oFUN, ordinal, "oFUN")
-  )
-  answer[prep$feature_names]
+  value
 }
 
 .kdml_fixed_distance <- function(df, distance, bandwidths, kernels,
-                                 standardize) {
+                                 standardize, drop_unused = TRUE) {
   if (!is.logical(standardize) || length(standardize) != 1L ||
       is.na(standardize)) {
     stop("`stan` must be TRUE or FALSE.", call. = FALSE)
   }
-  prep <- .kdml_prepare_data(df)
+  prep <- .kdml_prepare_data(df, drop_unused = drop_unused)
   state <- .kdml_validate_fixed_state(kernels, bandwidths, prep)
   spec <- list(
     x = prep$x,
@@ -79,7 +53,6 @@
       dimnames = list(NULL, prep$feature_names)
     ),
     kernels = state$kernel,
-    squared = TRUE,
     standardized = isTRUE(standardize)
   )
 }

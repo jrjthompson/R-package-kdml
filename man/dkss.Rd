@@ -14,9 +14,7 @@ based algorithm.
 }
 \usage{
 dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
-    oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE,
-    kernels = NULL, state = c("map", "last"), chain = 1L,
-    draw = NULL, newdata = NULL)
+    oFUN = "o_wangvanryzin", stan = TRUE, verbose = FALSE)
 }
 \arguments{
   \item{df}{
@@ -33,11 +31,11 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    selection methods. \code{mscv} specifies maximum-similarity cross-validation,
    and \code{np} specifies likelihood-cross validation which is calculated using 
    \code{\link[np]{npudensbw}} in package \code{\link[np]{np}}. Defaults to 
-   \code{mscv}. See details.
+   \code{mscv}. For joint MCMC selection of feature-specific kernels and
+   bandwidths, see \code{\link{mcmc.dkss}}.
 }
   \item{cFUN}{
-   character value specifying the continuous kernel function, or a character
-   vector with one value per continuous feature. Options include
+   character value specifying the continuous kernel function. Options include
    \code{c_gaussian}, \code{c_epanechnikov}, \code{c_uniform}, 
    \code{c_triangle}, \code{c_biweight}, \code{c_triweight}, \code{c_tricube}, 
    \code{c_cosine}, \code{c_logistic}, \code{c_sigmoid}, and \code{c_silverman}. 
@@ -47,13 +45,11 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 }
  \item{uFUN}{
    character value specifying the nominal kernel function for unordered
-   factors, or a character vector with one value per nominal feature. Options
-   include \code{u_aitken} and \code{u_aitchisonaitken}.
+   factors. Options include \code{u_aitken} and \code{u_aitchisonaitken}.
    Defaults to \code{u_aitken}. See details.
 }
  \item{oFUN}{
-   character value specifying the ordinal kernel function for ordered factors,
-   or a character vector with one value per ordinal feature.
+   character value specifying the ordinal kernel function for ordered factors.
    Options include \code{o_aitken}, \code{o_aitchisonaitken}, \code{o_habbema}, 
    \code{o_wangvanryzin}, and \code{o_liracine}. Note that if using \code{np} 
    for \code{bw} selection above, ordinal kernel types are restricted to either
@@ -70,26 +66,6 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
    console. If set to \code{FALSE}, no output is printed to the console. 
    Defaults to \code{FALSE}.
  }
- \item{kernels}{
-   optional character vector containing one type-compatible kernel name per
-   feature. A named vector is matched to the columns of \code{df}; an unnamed
-   vector follows data-frame column order. This requires a numeric \code{bw}
-   vector. Do not combine it with \code{cFUN}, \code{uFUN}, or \code{oFUN}.
- }
- \item{state}{
-   state selected when \code{df} is an MCMC fit: \code{"map"} (the default)
-   or \code{"last"}.
- }
- \item{chain}{
-   chain selected with \code{state = "last"} or an explicit \code{draw}.
- }
- \item{draw}{
-   optional retained MCMC draw. Supplying it overrides \code{state}.
- }
- \item{newdata}{
-   optional data frame on which to calculate distances using a fitted MCMC
-   state. Its features and categorical levels must match the fitting data.
- }
 }
 \details{
   \code{dkss} implements the distance using summation similarity distance (DKSS)
@@ -105,30 +81,26 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
   Racine (2007), Li and Racine (2003), Ouyan et al. (2006), and Titterington and
   Bowman (1985).
   
-  Each kernel requires a bandwidth specification, which can either be a user 
-  defined numeric vector of length \eqn{p} from alternative methodologies for 
-  bandwidth selection, or through two bandwidth selection methods can be 
-  specified. The \code{mscv} bandwidth selection is based on maximum similarity 
-  cross-validation by Ghashti and Thompson (2024), invoked by the function 
-  \code{\link{mscv.dkss}}. The \code{np} bandwidth selection follows the maximum
-  likelihood cross-validation method described by Li and Racine (2007) and Li 
-  and Racine (2003) for kernel density estimation of mixed-type data. 
+  Each kernel requires a bandwidth specification. Bandwidths may be supplied
+  as a user-defined numeric vector of length \eqn{p}, or selected using either
+  of the two built-in \code{bw} methods. The \code{mscv} method is based on
+  maximum-similarity cross-validation by Ghashti and Thompson (2024), invoked
+  by \code{\link{mscv.dkss}}. The \code{np} method follows the maximum-
+  likelihood cross-validation techniques described by Li and Racine (2007)
+  and Li and Racine (2003) for kernel density estimation of mixed-type data.
+  \code{\link{mcmc.dkss}} uses Markov chain Monte Carlo to jointly select
+  feature-specific kernels and bandwidths. Its fitted object can be passed
+  directly to \code{dkss}, which uses the sampled MAP state by default.
 
   Data contained in the data frame \code{df} may constitute any combinations of 
   continuous, nominal, or ordinal data, which is to be specified in the data 
   frame \code{df} using \code{\link{factor}} for nominal data, and 
   \code{\link{ordered}} for ordinal data. Data types can be in any order and 
-  will be detected automatically. User-inputted vectors of
-  bandwidths \code{bw} must be specified in the same order as the variables in
-  the data frame \code{df}, as to ensure they sorted accordingly by the routine.
+  will be detected automatically. Unnamed bandwidth vectors must follow the
+  column order of \code{df}. Named bandwidth vectors may be supplied in any
+  order but must contain every feature name exactly once. Returned bandwidths
+  are ordered by variable type.
 
-  When \code{df} is a fit returned by \code{mcmc.dkss}, \code{dkss} uses the
-  fit's sampled MAP state by default and preserves its feature-specific
-  kernels. Equivalently, users may pass \code{fit$map$bandwidth} as \code{bw}
-  and \code{fit$map$kernel} as \code{kernels} with the original data frame.
-  Feature-specific kernels are evaluated by the same compiled C implementation
-  used by the sampler. The original scalar \code{cFUN}, \code{uFUN}, and
-  \code{oFUN} interface remains available.
 }
 
 \value{
@@ -143,8 +115,16 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
  bandwidth specification method, sorted by variable type
  }
  \item{kernels}{
- a named character vector of selected kernels when feature-specific kernels or
- an MCMC fit are supplied
+ a named character vector of selected feature-specific kernels. This component
+ is present only when an MCMC fit is supplied
+ }
+ \item{state}{
+ selected retained draw and chain indices. This component is present only when
+ \code{df} is an MCMC fit
+ }
+ \item{standardized}{
+ logical recording \code{stan}. This component is present only when an MCMC
+ fit is supplied
  }
 }
 \references{
@@ -187,58 +167,39 @@ dkss(df, bw = "mscv", cFUN = "c_gaussian", uFUN = "u_aitken",
 }
 \author{
     John R. J. Thompson \email{john.thompson@ubc.ca}, Jesse S. Ghashti
-    \email{jesse.ghashti@ubc.ca}
+    \email{jesse.ghashti@ubc.ca}, and Daniel Krasnov
+    \email{daniel.krasnov@mail.mcgill.ca}
 }
 
 
 \seealso{
- \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}
+ \code{\link{mscv.dkss}}, \code{\link{mcmc.dkss}},
+ \code{\link{dkps}},
+ \code{\link{mscv.dkps}}, \code{\link{mcmc.dkps}}
 }
 \examples{
-\donttest{
-# example data frame with mixed numeric, nominal, and ordinal data.
-levels = c("Low", "Medium", "High")
+set.seed(1)
+levels <- c("Low", "Medium", "High")
 df <- data.frame(
-  x1 = runif(100, 0, 100),
-  x2 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x3 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x4 = rnorm(100, 10, 3),
-  x5 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels),
-  x6 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels))
+  x = seq_len(15),
+  group = factor(rep(c("A", "B", "C"), 5)),
+  rating = ordered(rep(levels, 5), levels = levels)
+)
 
-# minimal implementation requires just the data frame, and will automatically be
-# defaulted to the mscv bandwidth specification technique and default kernel 
-# function
-d1 <- dkss(df = df)
-# d$bandwidths to see the mscv obtained bandwidths
-# d$distances to see the distance matrix
-
-
-# try using the np package, which has few continuous and ordinal kernels 
-# to choose from. Recommended using default kernel functions
-d2 <- dkss(df = df, bw = "np")
-
-
-# precomputed bandwidth example
-# note that continuous variables requires bandwidths > 0
-# ordinal variables requires bandwidths in [0,1]
-# for nominal variables, u_aitken requires bandwidths in [0,1] 
-# and u_aitchisonaitken in [0,(c-1)/c]
-# where c is the number of unique values in the i-th column of df.
-# any bandwidths outside this range will result in a warning message
-bw_vec <- c(1.0, 0.5, 0.5, 5.0, 0.3, 0.3) 
-d3 <- dkss(df = df, bw = bw_vec)
-
-
-# user-specific kernel functions example
-d5 <- dkss(df = df, bw = "mscv", cFUN = "c_epanechnikov", uFUN = "u_aitken", 
-      oFUN = "o_habbema")
+# A fast distance calculation with supplied bandwidths.
+d <- dkss(df, bw = c(2, 0.25, 0.25))
+d$distances[1:4, 1:4]
 
 \dontrun{
-fit <- mcmc.dkss(df, warmup = 500, draws = 1000)
-d6 <- dkss(fit)
-d7 <- dkss(df, bw = fit$map$bandwidth, kernels = fit$map$kernel)
-}
+set.seed(2)
+# Select bandwidths using maximum-similarity cross-validation.
+selected <- dkss(df, bw = "mscv")
+
+# Select feature-specific kernels and bandwidths using MCMC.
+fit <- mcmc.dkss(df, chains = 4, warmup = 1000, draws = 2000)
+
+# Calculate distances using the sampled MAP state.
+d_map <- dkss(fit)
 }
 }
 

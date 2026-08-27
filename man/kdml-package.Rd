@@ -8,25 +8,25 @@ This package contains nonparametric kernel methods for calculating pairwise
 distances between mixed-type observations. These methods can be used in any 
 distance based algorithm, with emphasis placed on usage in clustering or 
 classification applications. Descriptions of the implementation of these methods
-can be found in Ghashti (2024) and Ghashti and Thompson (2024).
+can be found in Ghashti (2024) and Ghashti and Thompson (2025).
 }
 
 \details{
-This package contains two functions for pairwise distance calculations of 
-mixed-type data based on two different methods. Kernel methods also require 
-variable-specific bandwidths, with two additional functions for the bandwidth 
-specification methods. Additionally, this package contains a function methods 
-for mixed-type data generation.
+The package contains DKPS and DKSS pairwise distances, their MSCV bandwidth
+selectors, and a mixed-type data generator. A compiled MCMC implementation can
+jointly sample feature-specific kernels and bandwidths, with CPU and optional
+CUDA backends and posterior diagnostics.
 }
 
 \author{
-  John R.J. Thompson <john.thompson@ubc.ca>, Jesse S. Ghashti 
-  <jesse.ghashti@ubc.ca>
+  John R. J. Thompson \email{john.thompson@ubc.ca}, Jesse S. Ghashti
+  \email{jesse.ghashti@ubc.ca}, and Daniel Krasnov
+  \email{daniel.krasnov@mail.mcgill.ca}
 
-  Maintainer: John R.J. Thompson <john.thompson@ubc.ca>
+  Maintainer: John R. J. Thompson \email{john.thompson@ubc.ca}
 
   We would like to acknowledge funding support from the University of British 
-  Columbia Aspire Fund (UBC:www.ok.ubc.ca/). We also acknowledge support from 
+  Columbia Aspire Fund (\url{https://ok.ubc.ca/}). We also acknowledge support from
   the Natural Sciences and Engineering Research Council of Canada (NSERC). 
 
 }

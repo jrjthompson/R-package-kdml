@@ -150,24 +150,18 @@ mscv.dkss(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
  \code{\link{mscv.dkps}}, \code{\link{dkss}}, \code{\link{dkps}}
 }
 \examples{
-\donttest{
-# example data frame with mixed numeric, nominal, and ordinal data.
-levels = c("Low", "Medium", "High")
+set.seed(6)
+levels <- c("Low", "Medium", "High")
 df <- data.frame(
-  x1 = runif(100, 0, 100),
-  x2 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x3 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x4 = rnorm(100, 10, 3),
-  x5 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels),
-  x6 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels))
+  x = seq_len(12),
+  group = factor(rep(c("A", "B"), 6)),
+  rating = ordered(rep(levels, 4), levels = levels)
+)
 
-# minimal implementation requires just the data frame, with defaults
-bw <- mscv.dkss(df = df)
-
-# specify number of starts and kernel functions
-bw2 <- mscv.dkss(df = df, nstart = 5, ckernel = "c_triangle", 
-                ukernel = "u_aitken", okernel = "o_liracine")
-}
+# One restart keeps this executable example quick. Use more restarts when
+# fitting a substantive data set.
+selected <- mscv.dkss(df, nstart = 1)
+selected$bw
 }
 
 \keyword{ ~multivariate }
@@ -177,4 +171,3 @@ bw2 <- mscv.dkss(df = df, nstart = 5, ckernel = "c_triangle",
 \concept{ ~distances }
 \concept{ ~metrics }
 \concept{ ~metriclearning }
-
