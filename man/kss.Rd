@@ -9,8 +9,8 @@ observations  consisting of continuous (\code{numeric}), nominal
 (\code{factor}), and ordinal (\code{ordered}) variables using the method 
 described in Ghashti (2024). This kernel similarity learning methodology 
 calculates a kernel sum similarity function, with a variety of options for 
-kernel functions associated with each variable type and returns a distance 
-matrix that can be used in any distance-based algorithm.
+kernel functions associated with each variable type and returns a similarity
+matrix that can be used in similarity-based algorithms.
 }
 \usage{
 kss(df, bw = "np", npmethod = NULL, cFUN = "c_gaussian", 
@@ -66,13 +66,14 @@ kss(df, bw = "np", npmethod = NULL, cFUN = "c_gaussian",
    See details.
 }
   \item{nstart}{
-    integer value specifying the number of random starts for the \code{kmeans} 
-    algorithm. Defaults to \code{10}.
+    integer number of multistarts passed as \code{nmulti} to
+    \code{\link[np]{npudensbw}}. The default is the smaller of three and the
+    number of columns in \code{df}.
 }
 \item{stan}{
-   a logical value which specifies whether to scale the resulting distance 
+   a logical value which specifies whether to scale the resulting similarity
    matrix between 0 and 1 using min-max normalization. If set to \code{FALSE}, 
-   distances are unscaled. Defaults to \code{TRUE}.
+   similarities are unscaled. Defaults to \code{TRUE}.
 }
  \item{verbose}{
    a logical value which specifies whether to print procedural steps to the 
@@ -167,47 +168,25 @@ kss(df, bw = "np", npmethod = NULL, cFUN = "c_gaussian",
 
 
 \seealso{
- \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}, \code{\link{dkss}}, \code{link{spectral.clust}}
+ \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}},
+ \code{\link{dkss}}, \code{\link{spectral.clust}}
 }
 \examples{
-\donttest{
-# example data frame with mixed numeric, nominal, and ordinal data.
-levels = c("Low", "Medium", "High")
+set.seed(7)
+levels <- c("Low", "Medium", "High")
 df <- data.frame(
-  x1 = runif(100, 0, 100),
-  x2 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x3 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x4 = rnorm(100, 10, 3),
-  x5 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels),
-  x6 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels))
+  x = seq_len(15),
+  group = factor(rep(c("A", "B", "C"), 5)),
+  rating = ordered(rep(levels, 5), levels = levels)
+)
 
-# minimal implementation requires just the data frame, and will automatically be
-# defaulted to the mscv bandwidth specification technique and default kernel 
-# function
-s1 <- kss(df = df)
-# s$bandwidths to see the mscv obtained bandwidths
-# s$similarities to see the similarity matrix
+# Supplied bandwidths avoid optimization in this executable example.
+s <- kss(df, bw = c(2, 0.25, 0.25))
+s$similarities[1:4, 1:4]
 
-
-# try using the np package, which has few continuous and ordinal kernels 
-# to choose from. Recommended using default kernel functions
-s2 <- kss(df = df, bw = "np") #defaults to npmethod "cv.ml"
-
-
-# precomputed bandwidth example
-# note that continuous variables requires bandwidths > 0
-# ordinal variables requires bandwidths in [0,1]
-# for nominal variables, u_aitken requires bandwidths in [0,1] 
-# and u_aitchisonaitken in [0,(c-1)/c]
-# where c is the number of unique values in the i-th column of df.
-# any bandwidths outside this range will result in a warning message
-bw_vec <- c(1.0, 0.5, 0.5, 5.0, 0.3, 0.3) 
-s3 <- kss(df = df, bw = bw_vec)
-
-
-# user-specific kernel functions example with "cv.ls" from np.
-s4 <- kss(df = df, bw = "np", npmethod = "cv.ls", cFUN = "c_epanechnikov", 
-    uFUN = "u_aitken", oFUN = "o_wangvanryzin")
+\dontrun{
+# Data-driven bandwidth selection can take longer on substantive data.
+selected <- kss(df, bw = "np", npmethod = "cv.ml", nstart = 3)
 }
 }
 

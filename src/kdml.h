@@ -1,6 +1,15 @@
 #ifndef KDML_H
 #define KDML_H
 
+/*
+ * Use only the prefixed R API.  Besides avoiding namespace pollution, this
+ * keeps R's legacy `match` macro from rewriting OpenMP declare-variant
+ * pragmas in recent omp.h headers.
+ */
+#ifndef R_NO_REMAP
+# define R_NO_REMAP
+#endif
+
 #include <R.h>
 #include <Rinternals.h>
 
@@ -202,5 +211,11 @@ int kdml_run_chain(const kdml_data *data,
                    int *adapt_count, kdml_rng *rng,
                    volatile int *completed_sweeps, volatile int *cancel,
                    int check_interrupt);
+
+/* Registered .Call entry points. */
+SEXP kdml_mcmc_call(SEXP spec);
+SEXP kdml_score_call(SEXP spec);
+SEXP kdml_distance_call(SEXP spec);
+SEXP kdml_cuda_info_call(void);
 
 #endif

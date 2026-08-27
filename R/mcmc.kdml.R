@@ -36,7 +36,7 @@
   x
 }
 
-.kdml_prepare_data <- function(df) {
+.kdml_prepare_data <- function(df, drop_unused = TRUE) {
   if (!is.data.frame(df)) {
     stop("`df` must be a data frame.", call. = FALSE)
   }
@@ -71,7 +71,9 @@
         stop("Missing values are not supported; found one in `",
              feature_names[j], "`.", call. = FALSE)
       }
-      column <- droplevels(column)
+      if (drop_unused) {
+        column <- droplevels(column)
+      }
       observed_levels <- levels(column)
       if (length(observed_levels) < 2L) {
         stop("Ordinal feature `", feature_names[j],
@@ -87,7 +89,9 @@
         stop("Missing values are not supported; found one in `",
              feature_names[j], "`.", call. = FALSE)
       }
-      column <- droplevels(column)
+      if (drop_unused) {
+        column <- droplevels(column)
+      }
       observed_levels <- levels(column)
       if (length(observed_levels) < 2L) {
         stop("Nominal feature `", feature_names[j],
@@ -135,58 +139,6 @@
     feature_names = feature_names,
     row_names = rownames(df)
   )
-}
-
-.kdml_prepare_new_data <- function(df, training) {
-  if (!is.data.frame(df)) {
-    stop("`data` must be a data frame.", call. = FALSE)
-  }
-  if (nrow(df) < 1L) {
-    stop("`data` must contain at least one observation.", call. = FALSE)
-  }
-  if (is.null(names(df)) || anyDuplicated(names(df)) ||
-      !setequal(names(df), training$feature_names)) {
-    stop("`data` must contain exactly the features used to fit the sampler.",
-         call. = FALSE)
-  }
-
-  df <- df[, training$feature_names, drop = FALSE]
-  x <- matrix(0, nrow = nrow(df), ncol = length(training$feature_names),
-              dimnames = list(rownames(df), training$feature_names))
-
-  for (j in seq_along(training$feature_names)) {
-    feature <- training$feature_names[j]
-    column <- df[[j]]
-    type <- training$type[j]
-
-    if (type == 0L) {
-      if (!is.numeric(column)) {
-        stop("Continuous feature `", feature, "` must remain numeric.",
-             call. = FALSE)
-      }
-      column <- as.numeric(column)
-      if (any(!is.finite(column))) {
-        stop("Feature `", feature, "` contains a missing or non-finite value.",
-             call. = FALSE)
-      }
-      x[, j] <- column
-    } else {
-      if ((type == 1L && (!is.factor(column) || is.ordered(column))) ||
-          (type == 2L && !is.ordered(column))) {
-        stop("Categorical class for feature `", feature,
-             "` does not match the fitted data.", call. = FALSE)
-      }
-      encoded <- match(as.character(column), training$levels[[j]])
-      if (anyNA(encoded)) {
-        stop("Feature `", feature,
-             "` contains a level not observed during fitting.", call. = FALSE)
-      }
-      x[, j] <- encoded - 1L
-    }
-  }
-
-  storage.mode(x) <- "double"
-  x
 }
 
 .kdml_normalize_candidates <- function(kernel_candidates, prep) {
@@ -395,19 +347,17 @@
   answer
 }
 
-#'
-#' @export
-mcmc.kdml <- function(df, distance = c("dkps", "dkss"), chains = 1L,
-                      chain_threads = 1L,
-                      warmup = 1000L, draws = 1000L, thin = 1L,
-                      beta = 1, proposal_sd = 0.15,
-                      prior_mean = 0, prior_sd = 4,
-                      adapt = TRUE, target_accept = 0.44,
-                      kernel_candidates = NULL, initial_kernels = NULL,
-                      initial_bandwidths = NULL,
-                      backend = c("cpu", "cuda", "auto"),
-                      progress = interactive()) {
-  call <- match.call()
+.kdml_mcmc_fit <- function(df, distance = c("dkps", "dkss"), chains = 1L,
+                           chain_threads = 1L,
+                           warmup = 1000L, draws = 1000L, thin = 1L,
+                           beta = 1, proposal_sd = 0.15,
+                           prior_mean = 0, prior_sd = 4,
+                           adapt = TRUE, target_accept = 0.44,
+                           kernel_candidates = NULL, initial_kernels = NULL,
+                           initial_bandwidths = NULL,
+                           backend = c("cpu", "cuda"),
+                           progress = interactive(), .call = NULL) {
+  call <- if (is.null(.call)) match.call() else .call
   distance <- match.arg(distance)
   backend <- match.arg(backend)
   prep <- .kdml_prepare_data(df)
@@ -486,7 +436,7 @@ mcmc.kdml <- function(df, distance = c("dkps", "dkss"), chains = 1L,
     beta = as.numeric(beta),
     adapt = adapt,
     target_accept = as.numeric(target_accept),
-    backend = match(backend, c("cpu", "cuda", "auto")) - 1L,
+    backend = match(backend, c("cpu", "cuda")) - 1L,
     progress = progress,
     progress_in_place = progress && interactive()
   )
@@ -592,16 +542,50 @@ mcmc.kdml <- function(df, distance = c("dkps", "dkss"), chains = 1L,
   fit
 }
 
-#' @rdname mcmc.kdml
+#' @rdname mcmc.dkps
 #' @export
-mcmc.dkps <- function(df, ...) {
-  mcmc.kdml(df = df, distance = "dkps", ...)
+mcmc.dkps <- function(df, chains = 1L, chain_threads = 1L,
+                      warmup = 1000L, draws = 1000L, thin = 1L,
+                      beta = 1, proposal_sd = 0.15,
+                      prior_mean = 0, prior_sd = 4,
+                      adapt = TRUE, target_accept = 0.44,
+                      kernel_candidates = NULL, initial_kernels = NULL,
+                      initial_bandwidths = NULL,
+                      backend = c("cpu", "cuda"),
+                      progress = interactive()) {
+  .kdml_mcmc_fit(
+    df = df, distance = "dkps", chains = chains,
+    chain_threads = chain_threads, warmup = warmup, draws = draws,
+    thin = thin, beta = beta, proposal_sd = proposal_sd,
+    prior_mean = prior_mean, prior_sd = prior_sd, adapt = adapt,
+    target_accept = target_accept, kernel_candidates = kernel_candidates,
+    initial_kernels = initial_kernels,
+    initial_bandwidths = initial_bandwidths, backend = backend,
+    progress = progress, .call = match.call()
+  )
 }
 
-#' @rdname mcmc.kdml
+#' @rdname mcmc.dkss
 #' @export
-mcmc.dkss <- function(df, ...) {
-  mcmc.kdml(df = df, distance = "dkss", ...)
+mcmc.dkss <- function(df, chains = 1L, chain_threads = 1L,
+                      warmup = 1000L, draws = 1000L, thin = 1L,
+                      beta = 1, proposal_sd = 0.15,
+                      prior_mean = 0, prior_sd = 4,
+                      adapt = TRUE, target_accept = 0.44,
+                      kernel_candidates = NULL, initial_kernels = NULL,
+                      initial_bandwidths = NULL,
+                      backend = c("cpu", "cuda"),
+                      progress = interactive()) {
+  .kdml_mcmc_fit(
+    df = df, distance = "dkss", chains = chains,
+    chain_threads = chain_threads, warmup = warmup, draws = draws,
+    thin = thin, beta = beta, proposal_sd = proposal_sd,
+    prior_mean = prior_mean, prior_sd = prior_sd, adapt = adapt,
+    target_accept = target_accept, kernel_candidates = kernel_candidates,
+    initial_kernels = initial_kernels,
+    initial_bandwidths = initial_bandwidths, backend = backend,
+    progress = progress, .call = match.call()
+  )
 }
 
 #'
@@ -705,13 +689,7 @@ kdml.diagnostics <- function(
   answer
 }
 
-#'
-#' @export
-cuda_available <- function() {
-  .Call(C_kdml_cuda_available_call)
-}
-
-#' @rdname cuda_available
+#' @rdname cuda_info
 #' @export
 cuda_info <- function() {
   .Call(C_kdml_cuda_info_call)
@@ -790,10 +768,11 @@ print.kdml_mcmc <- function(x, ...) {
 .kdml_mcmc_evaluate <- function(df, distance = c("dkps", "dkss"),
                                 kernels, bandwidths,
                                 return_similarity = FALSE,
-                                backend = c("cpu", "cuda", "auto")) {
+                                backend = c("cpu", "cuda"),
+                                drop_unused = TRUE) {
   distance <- match.arg(distance)
   backend <- match.arg(backend)
-  prep <- .kdml_prepare_data(df)
+  prep <- .kdml_prepare_data(df, drop_unused = drop_unused)
   state <- .kdml_validate_fixed_state(kernels, bandwidths, prep)
   spec <- list(
     x = prep$x,
@@ -803,7 +782,7 @@ print.kdml_mcmc <- function(x, ...) {
     bandwidth = unname(state$bandwidth),
     metric = if (distance == "dkps") 0L else 1L,
     return_similarity = isTRUE(return_similarity),
-    backend = match(backend, c("cpu", "cuda", "auto")) - 1L
+    backend = match(backend, c("cpu", "cuda")) - 1L
   )
   answer <- .Call(C_kdml_score_call, spec)
   if (!is.null(answer$similarity)) {
@@ -812,45 +791,20 @@ print.kdml_mcmc <- function(x, ...) {
   answer
 }
 
-#'
-#' @export
-kdml.distance <- function(object, data = NULL, state = c("map", "last"),
-                          chain = 1L, draw = NULL, standardize = TRUE) {
+.kdml_map_distance <- function(object, standardize = TRUE) {
   if (!inherits(object, "kdml_mcmc")) {
     stop("`object` must inherit from `kdml_mcmc`.", call. = FALSE)
   }
-  state <- match.arg(state)
-  chain <- .kdml_scalar_integer(chain, "chain", 1L)
-  if (chain > object$control$chains) {
-    stop("`chain` exceeds the number of fitted chains.", call. = FALSE)
-  }
-
-  if (is.null(draw)) {
-    if (state == "map") {
-      draw <- object$map$draw
-      chain <- object$map$chain
-    } else {
-      draw <- object$control$draws
-    }
-  } else {
-    draw <- .kdml_scalar_integer(draw, "draw", 1L)
-    if (draw > object$control$draws) {
-      stop("`draw` exceeds the number of retained draws.", call. = FALSE)
-    }
-  }
+  draw <- object$map$draw
+  chain <- object$map$chain
   if (!is.logical(standardize) || length(standardize) != 1L ||
       is.na(standardize)) {
     stop("`standardize` must be TRUE or FALSE.", call. = FALSE)
   }
 
   prep <- object$preprocessing
-  if (is.null(data)) {
-    x <- prep$x
-    row_names <- prep$row_names
-  } else {
-    x <- .kdml_prepare_new_data(data, prep)
-    row_names <- rownames(data)
-  }
+  x <- prep$x
+  row_names <- prep$row_names
 
   codes <- as.integer(object$kernel_code[draw, , chain])
   bandwidths <- as.numeric(object$bandwidth[draw, , chain])
@@ -888,7 +842,6 @@ kdml.distance <- function(object, data = NULL, state = c("map", "last"),
     bandwidths = bandwidth_matrix,
     kernels = kernel_names,
     state = list(draw = draw, chain = chain),
-    squared = TRUE,
     standardized = isTRUE(standardize)
   )
 }

@@ -4,7 +4,13 @@
 ^LICENSE\.md$
 ^cran-comments\.md$
 ^archive(/|$)
-^build(/|$)
 ^src/Makevars$
 ^src/Makevars\.win$
 ^src/kdml_cuda_enabled$
+^figure(/|$)
+^kdml-local_files(/|$)
+^vignettes/.*_cache(/|$)
+^vignettes/.*_files(/|$)
+^vignettes/.*\.html$
+^local/real-data-benchmark(/|$)
+^local/mixed-type-paper-benchmark(/|$)

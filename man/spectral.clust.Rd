@@ -4,7 +4,7 @@
 Spectral Clustering using Similarity or Distance Matrices
 }
 \description{
-This function calculates performs spectral clustering with the k-means step 
+This function performs spectral clustering with a k-means step
 using precomputed similarity or distance matrices, and returns a vector of 
 cluster assignments.
 }
@@ -26,8 +26,8 @@ spectral.clust(S, k, nstart = 10, iter.max = 1000,
   }
 
   \item{nstart}{
-    integer value specifying the number of random starts for the bandwidth 
-    estimation. Defaults to 3 or the number of variables, whichever is larger.
+    integer number of random starts passed to \code{\link[stats]{kmeans}}.
+    Defaults to \code{10}.
   }
 
   \item{iter.max}{
@@ -58,7 +58,7 @@ spectral.clust(S, k, nstart = 10, iter.max = 1000,
   the function retains the largest values corresponding to the \code{neighbours}
   nearest observations. If \code{S} is a distance matrix (\code{is.sim = FALSE}), 
   it retains the smallest values for the nearest observations. The adjacency 
-  matrix is symmetrized and used to compute the unnormalized Laplacian matrix. 
+  matrix is symmetrized and used to compute a normalized Laplacian matrix.
   The eigenvectors corresponding to the smallest eigenvalues of the Laplacian 
   are extracted and clustered using the \code{kmeans} algorithm. The number of 
   clusters, \code{k}, and parameters such as the number of random starts 
@@ -96,22 +96,16 @@ spectral.clust(S, k, nstart = 10, iter.max = 1000,
 
 \seealso{
  \code{\link{mscv.dkps}}, \code{\link{dkps}}, \code{\link{mscv.dkss}}, 
- \code{\link{dkss}}, \code{link{kss}}
+ \code{\link{dkss}}, \code{\link{kss}}
 }
 \examples{
-# load the Iris dataset
-dat <- iris[,-5]
+set.seed(8)
+rows <- unlist(lapply(split(seq_len(nrow(iris)), iris$Species), head, 10))
+dat <- iris[rows, 1:4]
+distance <- as.matrix(dist(scale(dat)))
 
-# calculate pairwise similarities using maximum likelihood cross validation
-S <- kss(dat, bw = "np", npmethod = "cv.ml", cFUN = "c_gaussian", verbose = TRUE)
-
-# cluster points using spectral clustering and compare to true class labels
-cl <- spectral.clust(S$similarities, 3, is.sim = TRUE)
-table(cl$clusters, iris[,5])
-
-# try a different number of neighbours
-cl2 <- spectral.clust(S$similarities, 3, is.sim = TRUE, neighbours = 4)
-table(cl2$clusters, iris[,5])
+cl <- spectral.clust(distance, 3, is.sim = FALSE, neighbours = 5)
+table(cl$clusters, iris$Species[rows])
 }
 
 \keyword{ ~multivariate }

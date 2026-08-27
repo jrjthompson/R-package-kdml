@@ -4,6 +4,49 @@ confactord <- function(n = 200,
                         numMixVarOl = c(1,1,1),  
                         olVarType = c(0.1,0.1,0.1), 
                         catLevels = c(2,4)) {
+  validate_integer_vector <- function(value, length_required, label,
+                                      minimum = 0L) {
+    if (!is.numeric(value) || length(value) != length_required ||
+        any(!is.finite(value)) || any(value != floor(value)) ||
+        any(value < minimum) || any(value > .Machine$integer.max)) {
+      stop("`", label, "` must contain ", length_required,
+           " integer value", if (length_required == 1L) "" else "s",
+           " >= ", minimum, ".", call. = FALSE)
+    }
+    as.integer(value)
+  }
+
+  n <- validate_integer_vector(n, 1L, "n", minimum = 1L)
+  if (!is.numeric(popProb) || length(popProb) != 2L ||
+      any(!is.finite(popProb)) || any(popProb < 0) || any(popProb > 1) ||
+      abs(sum(popProb) - 1) > sqrt(.Machine$double.eps)) {
+    stop("`popProb` must contain two probabilities in [0, 1] that sum to 1.",
+         call. = FALSE)
+  }
+  popProb <- as.numeric(popProb) / sum(popProb)
+  numMixVar <- validate_integer_vector(
+    numMixVar, 3L, "numMixVar", minimum = 0L
+  )
+  numMixVarOl <- validate_integer_vector(
+    numMixVarOl, 3L, "numMixVarOl", minimum = 0L
+  )
+  if (!sum(numMixVar)) {
+    stop("`numMixVar` must request at least one feature.", call. = FALSE)
+  }
+  if (any(numMixVarOl > numMixVar)) {
+    stop("Each `numMixVarOl` count must not exceed its `numMixVar` count.",
+         call. = FALSE)
+  }
+  if (!is.numeric(olVarType) || length(olVarType) != 3L ||
+      any(!is.finite(olVarType)) ||
+      any(olVarType < 0.01 | olVarType > 0.99)) {
+    stop("`olVarType` must contain three finite values between 0.01 and 0.99.",
+         call. = FALSE)
+  }
+  catLevels <- validate_integer_vector(
+    catLevels, 2L, "catLevels", minimum = 2L
+  )
+
   # storing each entry for use
   pops = popProb
   dimCon = numMixVar[1]
@@ -17,18 +60,6 @@ confactord <- function(n = 200,
   ordOl = olVarType[3]
   catLev = catLevels[1]
   ordLev = catLevels[2]
-  
-  # argument checking
-  # only 2 populations
-  if (length(popProb) != 2) stop('Error: Must be 2 elements in popProb vec')
-  if (sum(popProb) != 1) stop('Error: Elements of popProb vec must sum to 1')
-  if (dimConOl > dimCon) stop('Error: # continuous variables must be >= # continuous variables with overlap')
-  if (dimCatOl > dimCat) stop('Error: # nominal variables must be >= # nominal variables with overlap')
-  if (dimOrdOl > dimOrd) stop('Error: # ordinal variables must be >= # ordinal variables with overlap')
-  if (conOl > 0.99 | conOl < 0.01 | catOl > 0.99 | catOl < 0.01 | ordOl > 0.99 | ordOl < 0.01) stop('Error: 
-                              Overlap must be between 0.01 and 0.99 (inclusive).')
-  if (catLev < 2 | ordLev < 2)  warning('There should be at least 2 levels for 
-                                       nominal and ordinal variables in catLevels argument')
   
   dimConOl = rep(c(1,0), c(dimConOl,dimCon - dimConOl))
   dimOrdOl = rep(c(1,0), c(dimOrdOl,dimOrd - dimOrdOl))
@@ -118,4 +149,3 @@ confactord <- function(n = 200,
   colnames(comb) <- paste0("V", 1:ncol(comb))
   return(list(data = comb, class = memb))
 }
-

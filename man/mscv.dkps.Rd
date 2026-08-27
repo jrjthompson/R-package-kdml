@@ -5,9 +5,9 @@ Maximum-similarity Cross-validated (MSCV) bandwidth selection method for the
 Distance using Kernel Product Similarities (DKPS)
 }
 \description{
-This function calculates maximum-similarity cross-validated bandwidths for the 
-distance using kernel summation similarity. This implementation uses the method 
-described in Ghashti and Thompson (2023) for mixed-type data that includes any 
+This function calculates maximum-similarity cross-validated bandwidths for the
+distance using kernel product similarity. This implementation uses the method
+described in Ghashti and Thompson (2025) for mixed-type data that includes any
 of numeric (continuous), factor (nominal), and ordered factor (ordinal) 
 variables. \code{mscv.dkps} calculates the bandwidths associated with each 
 kernel function for variable types and returns a numeric vector of bandwidths 
@@ -56,13 +56,13 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
  \item{verbose}{
    a logical value which specifies whether to output the \eqn{i}-th iteration of
    the total number of \code{nstarts}, and output if the optimization procedure 
-   converges. Defaults to \code{TRUE}.
+   converges. Defaults to \code{FALSE}.
 }
 }
 \details{
   \code{mscv.dkps} implements the maximum-similarity cross-validation (MSCV) 
   technique for bandwidth selection pertaining to the \code{\link{dkps}} function,
-  as described by Ghashti and Thompson (2023). This approach uses product kernels 
+  as described by Ghashti and Thompson (2025). This approach uses product kernels 
   for continuous variables, and summation kernels for nominal and ordinal data,
   which are then summed over all variable types to return the pairwise distance 
   between mixed-type data. 
@@ -153,24 +153,18 @@ mscv.dkps(df, nstart = NULL, ckernel = "c_gaussian", ukernel = "u_aitken",
  \code{\link{mscv.dkss}}, \code{\link{dkss}}, \code{\link{dkps}}
 }
 \examples{
-\donttest{
-# example data frame with mixed numeric, nominal, and ordinal data.
-levels = c("Low", "Medium", "High")
+set.seed(5)
+levels <- c("Low", "Medium", "High")
 df <- data.frame(
-  x1 = runif(100, 0, 100),
-  x2 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x3 = factor(sample(c("A", "B", "C"), 100, TRUE)),
-  x4 = rnorm(100, 10, 3),
-  x5 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels),
-  x6 = ordered(sample(c("Low", "Medium", "High"), 100, TRUE), levels = levels))
+  x = seq_len(12),
+  group = factor(rep(c("A", "B"), 6)),
+  rating = ordered(rep(levels, 4), levels = levels)
+)
 
-# minimal implementation requires just the data frame, with defaults
-bw <- mscv.dkps(df = df)
-
-# specify number of starts and kernel functions
-bw2 <- mscv.dkps(df = df, nstart = 5, ckernel = "c_triangle",
-                  ukernel = "u_aitken", okernel = "o_liracine")
-}
+# One restart keeps this executable example quick. Use more restarts when
+# fitting a substantive data set.
+selected <- mscv.dkps(df, nstart = 1)
+selected$bw
 }
 
 \keyword{ ~multivariate }
@@ -180,4 +174,3 @@ bw2 <- mscv.dkps(df = df, nstart = 5, ckernel = "c_triangle",
 \concept{ ~distances }
 \concept{ ~metrics }
 \concept{ ~metriclearning }
-
